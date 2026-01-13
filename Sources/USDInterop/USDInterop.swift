@@ -2,6 +2,9 @@ import Foundation
 import CxxStdlib
 @_exported import OpenUSD
 
+public typealias UsdStage = pxrInternal_v0_25_8__pxrReserved__.UsdStage
+public typealias UsdStageRefPtr = pxrInternal_v0_25_8__pxrReserved__.UsdStageRefPtr
+
 public enum USDInteropStage {
     public static func open(
         _ path: String,
