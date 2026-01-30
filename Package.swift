@@ -4,9 +4,7 @@ import PackageDescription
 let package = Package(
     name: "USDInterop",
     platforms: [
-        .macOS(.v15),
-        .iOS(.v18),
-        .visionOS(.v2)
+        .macOS(.v26)
     ],
     products: [
         .library(
@@ -19,13 +17,20 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "USDInterop",
+            name: "USDInteropCxx",
             dependencies: [
                 .product(name: "OpenUSD", package: "SwiftUsd")
             ],
-            swiftSettings: [
-                .interoperabilityMode(.Cxx),
-                .unsafeFlags(["-disable-cmo"], .when(configuration: .release))
+            path: "Sources/USDInteropCxx",
+            publicHeadersPath: "include",
+            cxxSettings: [
+                .headerSearchPath("include")
+            ]
+        ),
+        .target(
+            name: "USDInterop",
+            dependencies: [
+                "USDInteropCxx"
             ]
         )
     ],

@@ -1,0 +1,16 @@
+#ifndef USDINTEROPCXX_H
+#define USDINTEROPCXX_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+const char *usdinterop_export_usda(const char *path);
+const char *usdinterop_scene_graph_json(const char *path);
+void usdinterop_free_string(const char *value);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // USDINTEROPCXX_H

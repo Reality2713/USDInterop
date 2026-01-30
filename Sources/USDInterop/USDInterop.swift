@@ -1,52 +1,32 @@
 import Foundation
-import CxxStdlib
-@_exported import OpenUSD
-
-public typealias UsdStage = pxrInternal_v0_25_8__pxrReserved__.UsdStage
-public typealias UsdStageRefPtr = pxrInternal_v0_25_8__pxrReserved__.UsdStageRefPtr
+import USDInteropCxx
 
 public enum USDInteropStage {
-    public static func open(
-        _ path: String,
-        initialLoadSet: UsdStage.InitialLoadSet = .LoadAll
-    ) -> UsdStageRefPtr {
-        UsdStage.Open(std.string(path), initialLoadSet)
-    }
+	public static func exportUSDA(url: URL) -> String? {
+		exportUSDA(path: url.path)
+	}
 
-    public static func open(
-        url: URL,
-        initialLoadSet: UsdStage.InitialLoadSet = .LoadAll
-    ) -> UsdStageRefPtr {
-        open(url.path, initialLoadSet: initialLoadSet)
-    }
+	public static func exportUSDA(path: String) -> String? {
+		path.withCString { pointer in
+			guard let result = usdinterop_export_usda(pointer) else {
+				return nil
+			}
+			defer { usdinterop_free_string(result) }
+			return String(cString: result)
+		}
+	}
 
-    public static func createInMemory(
-        _ identifier: String,
-        initialLoadSet: UsdStage.InitialLoadSet = .LoadAll
-    ) -> UsdStageRefPtr {
-        UsdStage.CreateInMemory(std.string(identifier), initialLoadSet)
-    }
-}
+	public static func sceneGraphJSON(url: URL) -> String? {
+		sceneGraphJSON(path: url.path)
+	}
 
-public extension UsdStage {
-    static func open(
-        _ path: String,
-        initialLoadSet: UsdStage.InitialLoadSet = .LoadAll
-    ) -> UsdStageRefPtr {
-        USDInteropStage.open(path, initialLoadSet: initialLoadSet)
-    }
-
-    static func open(
-        url: URL,
-        initialLoadSet: UsdStage.InitialLoadSet = .LoadAll
-    ) -> UsdStageRefPtr {
-        USDInteropStage.open(url: url, initialLoadSet: initialLoadSet)
-    }
-
-    static func createInMemory(
-        _ identifier: String,
-        initialLoadSet: UsdStage.InitialLoadSet = .LoadAll
-    ) -> UsdStageRefPtr {
-        USDInteropStage.createInMemory(identifier, initialLoadSet: initialLoadSet)
-    }
+	public static func sceneGraphJSON(path: String) -> String? {
+		path.withCString { pointer in
+			guard let result = usdinterop_scene_graph_json(pointer) else {
+				return nil
+			}
+			defer { usdinterop_free_string(result) }
+			return String(cString: result)
+		}
+	}
 }
