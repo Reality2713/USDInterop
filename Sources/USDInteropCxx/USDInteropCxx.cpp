@@ -1,5 +1,8 @@
 #include "USDInteropCxx.h"
 
+#include "pxr/base/gf/bbox3d.h"
+#include "pxr/base/gf/range3d.h"
+#include "pxr/base/gf/vec3d.h"
 #include "pxr/base/gf/vec3f.h"
 #include "pxr/base/tf/token.h"
 #include "pxr/base/vt/array.h"
@@ -8,6 +11,9 @@
 #include "pxr/usd/usd/prim.h"
 #include "pxr/usd/usd/primRange.h"
 #include "pxr/usd/usd/stage.h"
+#include "pxr/usd/usd/timeCode.h"
+#include "pxr/usd/usdGeom/bboxCache.h"
+#include "pxr/usd/usdGeom/tokens.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -164,50 +170,37 @@ USDInteropBounds usdinterop_scene_bounds(const char *path) {
     return result;
   }
 
-  float minX = std::numeric_limits<float>::max();
-  float minY = std::numeric_limits<float>::max();
-  float minZ = std::numeric_limits<float>::max();
-  float maxX = std::numeric_limits<float>::lowest();
-  float maxY = std::numeric_limits<float>::lowest();
-  float maxZ = std::numeric_limits<float>::lowest();
-  bool hasGeometry = false;
+  // Use UsdGeomBBoxCache for proper bounds calculation
+  // This works correctly with payloads, references, and variants
+  TfTokenVector purposes = {UsdGeomTokens->default_, UsdGeomTokens->render};
+  UsdGeomBBoxCache bboxCache(UsdTimeCode::Default(), purposes, true);
 
-  // Traverse all prims looking for Mesh types
-  for (const UsdPrim &prim : stage->Traverse()) {
-    if (prim.GetTypeName() == TfToken("Mesh")) {
-      UsdAttribute pointsAttr = prim.GetAttribute(TfToken("points"));
-      if (pointsAttr) {
-        VtArray<GfVec3f> points;
-        if (pointsAttr.Get(&points)) {
-          for (const GfVec3f &pt : points) {
-            hasGeometry = true;
-            minX = std::min(minX, pt[0]);
-            minY = std::min(minY, pt[1]);
-            minZ = std::min(minZ, pt[2]);
-            maxX = std::max(maxX, pt[0]);
-            maxY = std::max(maxY, pt[1]);
-            maxZ = std::max(maxZ, pt[2]);
-          }
-        }
-      }
-    }
+  UsdPrim root = stage->GetDefaultPrim();
+  if (!root.IsValid()) {
+    root = stage->GetPseudoRoot();
   }
 
-  if (hasGeometry) {
+  GfBBox3d worldBounds = bboxCache.ComputeWorldBound(root);
+  GfRange3d range = worldBounds.ComputeAlignedBox();
+
+  if (!range.IsEmpty()) {
     result.hasGeometry = 1;
-    result.minX = minX;
-    result.minY = minY;
-    result.minZ = minZ;
-    result.maxX = maxX;
-    result.maxY = maxY;
-    result.maxZ = maxZ;
-    result.centerX = (minX + maxX) / 2.0f;
-    result.centerY = (minY + maxY) / 2.0f;
-    result.centerZ = (minZ + maxZ) / 2.0f;
-    float extentX = maxX - minX;
-    float extentY = maxY - minY;
-    float extentZ = maxZ - minZ;
-    result.maxExtent = std::max(extentX, std::max(extentY, extentZ));
+    GfVec3d min = range.GetMin();
+    GfVec3d max = range.GetMax();
+    result.minX = static_cast<float>(min[0]);
+    result.minY = static_cast<float>(min[1]);
+    result.minZ = static_cast<float>(min[2]);
+    result.maxX = static_cast<float>(max[0]);
+    result.maxY = static_cast<float>(max[1]);
+    result.maxZ = static_cast<float>(max[2]);
+    result.centerX = static_cast<float>((min[0] + max[0]) / 2.0);
+    result.centerY = static_cast<float>((min[1] + max[1]) / 2.0);
+    result.centerZ = static_cast<float>((min[2] + max[2]) / 2.0);
+    double extentX = max[0] - min[0];
+    double extentY = max[1] - min[1];
+    double extentZ = max[2] - min[2];
+    result.maxExtent =
+        static_cast<float>(std::max(extentX, std::max(extentY, extentZ)));
   }
 
   return result;
