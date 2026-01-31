@@ -10,12 +10,19 @@ let package = Package(
         .library(
             name: "USDInterop",
             targets: ["USDInterop"]
+        ),
+        .library(
+            name: "USDInterfaces",
+            targets: ["USDInterfaces"]
         )
     ],
     dependencies: [
         .package(url: "https://github.com/apple/SwiftUsd.git", from: "5.2.0")
     ],
     targets: [
+        .target(
+            name: "USDInterfaces"
+        ),
         .target(
             name: "USDInteropCxx",
             dependencies: [
@@ -30,6 +37,7 @@ let package = Package(
         .target(
             name: "USDInterop",
             dependencies: [
+                "USDInterfaces",
                 "USDInteropCxx"
             ]
         )
