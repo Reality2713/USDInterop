@@ -1,0 +1,16 @@
+[0/1] Planning build
+Building for debugging...
+[0/44] Compiling TypeConversionInitializers.cpp
+[1/44] Write swift-version--FE76C4972A19952.txt
+[2/43] Compiling SdfValueTypeNames_Extensions.cpp
+[3/43] Compiling SdfSpecHandle.cpp
+[4/43] Compiling SdfLayer.cpp
+[5/43] Compiling Miscellaneous.cpp
+[6/43] Compiling UsdAttribute.cpp
+[7/43] Compiling SchemaUtil.cpp
+[8/43] Compiling _OpenUSD_SwiftBindingHelpers.cpp
+[9/43] Compiling VtDictionaryConstIteratorWrapper.cpp
+[10/43] Compiling UsdPrimTypeInfoWrapper.cpp
+[11/43] Compiling UsdPrimRangeIteratorWrapper.cpp
+[12/43] Compiling Enums.mm
+[13/43] Compiling ReferenceTypeConformances.cpp

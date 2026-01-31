@@ -1,0 +1,77 @@
+[0/1] Planning build
+Building for debugging...
+[0/44] Write swift-version--FE76C4972A19952.txt
+[1/43] Compiling Reduce.cpp
+[2/43] Compiling Loops.cpp
+[3/43] Compiling ArResolverWrapper.cpp
+[4/43] Compiling SdfValueTypeNames_Extensions.cpp
+[5/43] Compiling _OpenUSD_SwiftBindingHelpers.cpp
+[6/43] Compiling SchemaUtil.cpp
+[7/43] Compiling HgiWrapper.cpp
+[8/43] Compiling UsdAppUtilsFrameRecorderWrapper.cpp
+[9/43] Compiling HgiMetalWrapper.mm
+[10/43] Compiling VtDictionaryConstIteratorWrapper.cpp
+[11/43] Compiling UsdPrimTypeInfoWrapper.cpp
+[12/43] Compiling ReferenceTypeConformances.cpp
+[13/43] Compiling Enums.mm
+[14/43] Compiling UsdPrimRangeIteratorWrapper.cpp
+[15/43] Compiling TfErrorMarkWrapper.cpp
+[16/43] Compiling SdfZipFileIteratorWrapper.cpp
+[17/43] Compiling Hashable.cpp
+[18/43] Compiling Util.cpp
+[19/43] Compiling DetachedTask.cpp
+[20/43] Compiling SwiftKey.cpp
+[21/43] Compiling HioImageWrapper.cpp
+[22/43] Compiling ListenerHolder.mm
+[23/43] Compiling __LinkerErrorWorkarounds.cpp
+[24/43] Compiling CustomStringConvertible.mm
+[25/43] Compiling Usd_PrimFlags.cpp
+[26/43] Compiling VtDictionary.cpp
+[27/43] Compiling UsdUtilsTimeCodeRange.cpp
+[28/43] Compiling TypeConversionInitializers.cpp
+[29/43] Compiling Comparable.cpp
+[30/43] Compiling Equatable.cpp
+[31/43] Compiling UsdImagingGLEngineWrapper.cpp
+[32/43] Compiling operatorBool.cpp
+[33/43] Compiling Math.cpp
+[33/43] Write sources
+[35/43] Compiling SdfSpecHandle.cpp
+[36/43] Compiling UsdRelationship.cpp
+[37/43] Compiling HydraHelpers.mm
+[38/43] Compiling UsdAttribute.cpp
+[39/43] Compiling SdfLayer.cpp
+[40/43] Compiling Miscellaneous.cpp
+[41/43] Compiling StaticTokens.mm
+In file included from /Volumes/Plutonian/_Developer/USDInterop/Sources/USDInteropCxx/USDInteropCxx.cpp:10:
+In file included from /Volumes/Plutonian/_Developer/USDInterop/.build/checkouts/SwiftUsd/swift-package/Sources/_OpenUSD_SwiftBindingHelpers/include/pxr/usd/usd/attribute.h:13:
+In file included from /Volumes/Plutonian/_Developer/USDInterop/.build/checkouts/SwiftUsd/swift-package/Sources/_OpenUSD_SwiftBindingHelpers/include/pxr/usd/usd/property.h:13:
+In file included from /Volumes/Plutonian/_Developer/USDInterop/.build/checkouts/SwiftUsd/swift-package/Sources/_OpenUSD_SwiftBindingHelpers/include/pxr/usd/usd/object.h:15:
+In file included from /Volumes/Plutonian/_Developer/USDInterop/.build/checkouts/SwiftUsd/swift-package/Sources/_OpenUSD_SwiftBindingHelpers/include/pxr/usd/usd/primData.h:16:
+In file included from /Volumes/Plutonian/_Developer/USDInterop/.build/checkouts/SwiftUsd/swift-package/Sources/_OpenUSD_SwiftBindingHelpers/include/pxr/usd/usd/primDefinition.h:12:
+In file included from /Volumes/Plutonian/_Developer/USDInterop/.build/checkouts/SwiftUsd/swift-package/Sources/_OpenUSD_SwiftBindingHelpers/include/pxr/usd/usd/schemaRegistry.h:14:
+In file included from /Volumes/Plutonian/_Developer/USDInterop/.build/checkouts/SwiftUsd/swift-package/Sources/_OpenUSD_SwiftBindingHelpers/include/pxr/usd/sdf/layer.h:29:
+In file included from /Volumes/Plutonian/_Developer/USDInterop/.build/checkouts/SwiftUsd/swift-package/Sources/_OpenUSD_SwiftBindingHelpers/include/pxr/base/work/dispatcher.h:14:
+In file included from /Volumes/Plutonian/_Developer/USDInterop/.build/checkouts/SwiftUsd/swift-package/Sources/_OpenUSD_SwiftBindingHelpers/include/pxr/base/work/impl.h:10:
+In file included from /Volumes/Plutonian/_Developer/USDInterop/.build/checkouts/SwiftUsd/swift-package/Sources/_OpenUSD_SwiftBindingHelpers/include/pxr/base/work/workTBB/impl.h:12:
+In file included from /Volumes/Plutonian/_Developer/USDInterop/.build/checkouts/SwiftUsd/swift-package/Sources/_OpenUSD_SwiftBindingHelpers/include/pxr/base/work/workTBB/detachedTask_impl.h:11:
+In file included from /Volumes/Plutonian/_Developer/USDInterop/.build/checkouts/SwiftUsd/swift-package/Sources/_OpenUSD_SwiftBindingHelpers/include/pxr/base/work/workTBB/dispatcher_impl.h:20:
+/Volumes/Plutonian/_Developer/USDInterop/.build/checkouts/SwiftUsd/swift-package/Sources/_OpenUSD_SwiftBindingHelpers/include/tbb/task.h:21:9: warning: TBB Warning: tbb/task.h is deprecated. For details, please see Deprecated Features appendix in the TBB reference manual. [-W#pragma-messages]
+   21 | #pragma message("TBB Warning: tbb/task.h is deprecated. For details, please see Deprecated Features appendix in the TBB reference manual.")
+      |         ^
+1 warning generated.
+[42/43] Compiling USDInteropCxx USDInteropCxx.cpp
+error: emit-module command failed with exit code 1 (use -v to see invocation)
+[44/45] Emitting module USDInterop
+<unknown>:0: error: cannot load underlying module for 'CxxStdlib'
+<module-includes>:1:9: note: in file included from <module-includes>:1:
+   1 | #import "pxr/pxr.h"
+     |         `- note: in file included from <module-includes>:1:
+   2 | #import "pxr/base/arch/align.h"
+   3 | #import "pxr/base/arch/api.h"
+[45/45] Compiling USDInterop USDInterop.swift
+<unknown>:0: error: cannot load underlying module for 'CxxStdlib'
+<module-includes>:1:9: note: in file included from <module-includes>:1:
+   1 | #import "pxr/pxr.h"
+     |         `- note: in file included from <module-includes>:1:
+   2 | #import "pxr/base/arch/align.h"
+   3 | #import "pxr/base/arch/api.h"
