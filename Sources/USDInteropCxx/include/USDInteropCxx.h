@@ -2,6 +2,7 @@
 #define USDINTEROPCXX_H
 
 #ifdef __cplusplus
+#include "USDUtilsHelper.hpp"
 extern "C" {
 #endif
 

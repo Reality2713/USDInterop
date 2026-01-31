@@ -225,3 +225,530 @@ public protocol USDVariantCombining: Sendable {
 
 public typealias USDAdvancedInteropProviding =
     USDPrimListing & USDDefaultPrimEditing & USDSchemaApplying & USDVariantEditing & USDVariantCombining
+
+// MARK: - Inspection & Validation (Swift-only DTOs)
+
+public struct USDStageMetadata: Equatable, Sendable {
+    public var upAxis: String?
+    public var metersPerUnit: Double?
+    public var defaultPrimName: String?
+    public var autoPlay: Bool?
+    public var playbackMode: String?
+    public var timeCodesPerSecond: Double?
+    public var startTimeCode: Double?
+    public var endTimeCode: Double?
+    public var animationTracks: [String]
+    public var availableCameras: [String]
+
+    public init(
+        upAxis: String? = nil,
+        metersPerUnit: Double? = nil,
+        defaultPrimName: String? = nil,
+        autoPlay: Bool? = nil,
+        playbackMode: String? = nil,
+        timeCodesPerSecond: Double? = nil,
+        startTimeCode: Double? = nil,
+        endTimeCode: Double? = nil,
+        animationTracks: [String] = [],
+        availableCameras: [String] = []
+    ) {
+        self.upAxis = upAxis
+        self.metersPerUnit = metersPerUnit
+        self.defaultPrimName = defaultPrimName
+        self.autoPlay = autoPlay
+        self.playbackMode = playbackMode
+        self.timeCodesPerSecond = timeCodesPerSecond
+        self.startTimeCode = startTimeCode
+        self.endTimeCode = endTimeCode
+        self.animationTracks = animationTracks
+        self.availableCameras = availableCameras
+    }
+}
+
+public struct USDPrimTreeNode: Equatable, Sendable {
+    public var primPath: String
+    public var primName: String
+    public var typeName: String
+    public var purpose: String
+    public var children: [USDPrimTreeNode]
+
+    public init(
+        primPath: String,
+        primName: String,
+        typeName: String,
+        purpose: String = "default",
+        children: [USDPrimTreeNode] = []
+    ) {
+        self.primPath = primPath
+        self.primName = primName
+        self.typeName = typeName
+        self.purpose = purpose
+        self.children = children
+    }
+}
+
+public struct USDGeometryStatistics: Equatable, Sendable {
+    public var totalTriangles: Int
+    public var totalVertices: Int
+    public var meshCount: Int
+    public var materialCount: Int
+    public var textureCount: Int
+
+    public init(
+        totalTriangles: Int = 0,
+        totalVertices: Int = 0,
+        meshCount: Int = 0,
+        materialCount: Int = 0,
+        textureCount: Int = 0
+    ) {
+        self.totalTriangles = totalTriangles
+        self.totalVertices = totalVertices
+        self.meshCount = meshCount
+        self.materialCount = materialCount
+        self.textureCount = textureCount
+    }
+}
+
+public enum USDAnimatableStatus: String, Equatable, Sendable {
+    case animatable
+    case static_
+    case unknown
+}
+
+public struct USDBlendShapeInfo: Equatable, Sendable {
+    public var path: String
+    public var name: String
+    public var weightCount: Int
+    public var weightNames: [String]
+
+    public init(path: String, name: String, weightCount: Int, weightNames: [String]) {
+        self.path = path
+        self.name = name
+        self.weightCount = weightCount
+        self.weightNames = weightNames
+    }
+}
+
+public struct USDModelInfo: Equatable, Sendable {
+    public var boundsExtent: SIMD3<Float>
+    public var boundsCenter: SIMD3<Float>
+    public var scale: SIMD3<Float>
+    public var upAxis: String
+    public var animationCount: Int
+    public var animationNames: [String]
+    public var metersPerUnit: Double
+    public var autoPlay: Bool?
+    public var playbackMode: String?
+    public var animatableStatus: USDAnimatableStatus
+    public var hasAnimationLibrary: Bool
+    public var skeletonJointCount: Int
+    public var maxJointInfluences: Int
+    public var hasSkinnedMesh: Bool
+    public var blendShapes: [USDBlendShapeInfo]
+
+    public init(
+        boundsExtent: SIMD3<Float> = .zero,
+        boundsCenter: SIMD3<Float> = .zero,
+        scale: SIMD3<Float> = .one,
+        upAxis: String = "Unknown",
+        animationCount: Int = 0,
+        animationNames: [String] = [],
+        metersPerUnit: Double = 1.0,
+        autoPlay: Bool? = nil,
+        playbackMode: String? = nil,
+        animatableStatus: USDAnimatableStatus = .unknown,
+        hasAnimationLibrary: Bool = false,
+        skeletonJointCount: Int = 0,
+        maxJointInfluences: Int = 0,
+        hasSkinnedMesh: Bool = false,
+        blendShapes: [USDBlendShapeInfo] = []
+    ) {
+        self.boundsExtent = boundsExtent
+        self.boundsCenter = boundsCenter
+        self.scale = scale
+        self.upAxis = upAxis
+        self.animationCount = animationCount
+        self.animationNames = animationNames
+        self.metersPerUnit = metersPerUnit
+        self.autoPlay = autoPlay
+        self.playbackMode = playbackMode
+        self.animatableStatus = animatableStatus
+        self.hasAnimationLibrary = hasAnimationLibrary
+        self.skeletonJointCount = skeletonJointCount
+        self.maxJointInfluences = maxJointInfluences
+        self.hasSkinnedMesh = hasSkinnedMesh
+        self.blendShapes = blendShapes
+    }
+}
+
+public struct USDPrimAttributes: Equatable, Sendable {
+    public struct AuthoredAttribute: Equatable, Sendable {
+        public var name: String
+        public var value: String
+
+        public init(name: String, value: String) {
+            self.name = name
+            self.value = value
+        }
+    }
+
+    public var primPath: String
+    public var primName: String
+    public var typeName: String
+    public var isActive: Bool
+    public var visibility: String
+    public var purpose: String
+    public var kind: String
+    public var authoredAttributes: [AuthoredAttribute]
+
+    public init(
+        primPath: String,
+        primName: String,
+        typeName: String,
+        isActive: Bool,
+        visibility: String,
+        purpose: String,
+        kind: String,
+        authoredAttributes: [AuthoredAttribute]
+    ) {
+        self.primPath = primPath
+        self.primName = primName
+        self.typeName = typeName
+        self.isActive = isActive
+        self.visibility = visibility
+        self.purpose = purpose
+        self.kind = kind
+        self.authoredAttributes = authoredAttributes
+    }
+}
+
+public struct USDMaterialInfo: Equatable, Sendable {
+    public enum MaterialType: String, Equatable, Sendable {
+        case previewSurface
+        case materialX
+        case unknown
+    }
+
+    public var path: String
+    public var name: String
+    public var materialType: MaterialType
+    public var properties: [USDMaterialProperty]
+
+    public init(path: String, name: String, materialType: MaterialType, properties: [USDMaterialProperty]) {
+        self.path = path
+        self.name = name
+        self.materialType = materialType
+        self.properties = properties
+    }
+}
+
+public struct USDMaterialProperty: Equatable, Sendable {
+    public enum PropertyType: String, Equatable, Sendable {
+        case color
+        case float
+        case texture
+    }
+
+    public enum PropertyValue: Equatable, Sendable {
+        case color(r: Float, g: Float, b: Float)
+        case float(Float)
+        case texture(url: String, resolvedPath: String?)
+    }
+
+    public var name: String
+    public var type: PropertyType
+    public var value: PropertyValue
+
+    public init(name: String, type: PropertyType, value: PropertyValue) {
+        self.name = name
+        self.type = type
+        self.value = value
+    }
+}
+
+public enum USDFeatureOrigin: String, Equatable, Sendable {
+    case core = "USD"
+    case preliminary = "AR"
+    case realityKit = "RK"
+    case materialX = "MX"
+}
+
+public struct USDTimelineInfo: Equatable, Sendable {
+    public var path: String
+    public var name: String
+    public var trackCount: Int
+    public var actionKinds: [String]
+
+    public init(path: String, name: String, trackCount: Int = 0, actionKinds: [String] = []) {
+        self.path = path
+        self.name = name
+        self.trackCount = trackCount
+        self.actionKinds = actionKinds
+    }
+}
+
+public struct USDBehaviorInfo: Equatable, Sendable {
+    public var path: String
+    public var name: String
+    public var triggerTypes: [String]
+    public var actionTypes: [String]
+
+    public init(path: String, name: String, triggerTypes: [String] = [], actionTypes: [String] = []) {
+        self.path = path
+        self.name = name
+        self.triggerTypes = triggerTypes
+        self.actionTypes = actionTypes
+    }
+}
+
+public struct USDAnchorInfo: Equatable, Sendable {
+    public var path: String
+    public var anchorType: String
+    public var alignment: String?
+    public var referenceImagePath: String?
+
+    public init(path: String, anchorType: String, alignment: String? = nil, referenceImagePath: String? = nil) {
+        self.path = path
+        self.anchorType = anchorType
+        self.alignment = alignment
+        self.referenceImagePath = referenceImagePath
+    }
+}
+
+public struct USDRealityKitExtensionsInfo: Equatable, Sendable {
+    public var timelines: [USDTimelineInfo]
+    public var behaviors: [USDBehaviorInfo]
+    public var anchors: [USDAnchorInfo]
+    public var textPrims: [String]
+    public var components: [String]
+
+    public init(
+        timelines: [USDTimelineInfo] = [],
+        behaviors: [USDBehaviorInfo] = [],
+        anchors: [USDAnchorInfo] = [],
+        textPrims: [String] = [],
+        components: [String] = []
+    ) {
+        self.timelines = timelines
+        self.behaviors = behaviors
+        self.anchors = anchors
+        self.textPrims = textPrims
+        self.components = components
+    }
+}
+
+public struct USDTimelineStructureInfo: Equatable, Sendable {
+    public var path: String
+    public var tracks: [USDTimelineTrackInfo]
+
+    public init(path: String, tracks: [USDTimelineTrackInfo] = []) {
+        self.path = path
+        self.tracks = tracks
+    }
+}
+
+public struct USDTimelineTrackInfo: Equatable, Sendable {
+    public var path: String
+    public var name: String
+    public var actions: [USDRealityKitActionInfo]
+
+    public init(path: String, name: String, actions: [USDRealityKitActionInfo] = []) {
+        self.path = path
+        self.name = name
+        self.actions = actions
+    }
+}
+
+public struct USDRealityKitActionInfo: Equatable, Sendable {
+    public var path: String
+    public var name: String
+    public var kind: String
+    public var startTime: Double
+    public var duration: Double
+
+    public init(path: String, name: String, kind: String, startTime: Double = 0, duration: Double = 0) {
+        self.path = path
+        self.name = name
+        self.kind = kind
+        self.startTime = startTime
+        self.duration = duration
+    }
+}
+
+public struct USDBehaviorGraphInfo: Equatable, Sendable {
+    public var path: String
+    public var connections: [USDBehaviorConnection]
+
+    public init(path: String, connections: [USDBehaviorConnection] = []) {
+        self.path = path
+        self.connections = connections
+    }
+}
+
+public struct USDBehaviorConnection: Equatable, Sendable {
+    public var triggerPath: String
+    public var triggerType: String
+    public var actionPath: String
+    public var actionType: String
+
+    public init(triggerPath: String, triggerType: String, actionPath: String, actionType: String) {
+        self.triggerPath = triggerPath
+        self.triggerType = triggerType
+        self.actionPath = actionPath
+        self.actionType = actionType
+    }
+}
+
+public struct USDDependencyCheckResult: Equatable, Sendable {
+    public var allResolved: Bool
+    public var unresolvedPaths: [String]
+
+    public init(allResolved: Bool, unresolvedPaths: [String]) {
+        self.allResolved = allResolved
+        self.unresolvedPaths = unresolvedPaths
+    }
+}
+
+public enum USDFixAction: Equatable, Sendable {
+    case remapSkeleton(source: String, target: String)
+    case mergeSkeletons
+    case setUpAxis(to: String)
+    case setMetersPerUnit(to: Double)
+    case makeRCPReady
+    case setDefaultPrim(path: String)
+    case addUVs(primPath: String)
+    case assignMaterial(primPath: String, materialPath: String)
+    case cleanupMissingReference(filePath: String)
+    case applyMissingSchema(primPath: String, schemaName: String)
+    case setDoubleSided(primPath: String, value: Bool)
+    case setSubdivisionScheme(primPath: String, scheme: String)
+    case flattenNestedShader(parentPath: String, childPath: String)
+    case setTexture(materialPath: String, propertyName: String, textureURL: URL)
+    case fixShaderPropertyType(primPath: String, inputName: String, expectedType: String)
+}
+
+public enum USDValidationSeverity: String, Equatable, Sendable {
+    case error
+    case warning
+    case info
+    case success
+}
+
+public struct USDValidationIssue: Equatable, Sendable {
+    public var severity: USDValidationSeverity
+    public var message: String
+    public var details: String?
+    public var primPath: String?
+    public var fix: USDFixAction?
+
+    public init(
+        severity: USDValidationSeverity,
+        message: String,
+        details: String? = nil,
+        primPath: String? = nil,
+        fix: USDFixAction? = nil
+    ) {
+        self.severity = severity
+        self.message = message
+        self.details = details
+        self.primPath = primPath
+        self.fix = fix
+    }
+}
+
+public struct USDValidationOutput: Equatable, Sendable {
+    public var results: [USDValidationIssue]
+    public var detectedUpAxis: String
+    public var detectedMetersPerUnit: Double
+    public var skeletonJointCount: Int
+    public var maxJointInfluences: Int
+    public var hasSkinnedMesh: Bool
+    public var hasBlendShapes: Bool
+    public var hasSkelAnimation: Bool
+    public var meshCount: Int
+    public var materialCount: Int
+    public var pointInstancerCount: Int
+
+    public init(
+        results: [USDValidationIssue] = [],
+        detectedUpAxis: String = "Unknown",
+        detectedMetersPerUnit: Double = 1.0,
+        skeletonJointCount: Int = 0,
+        maxJointInfluences: Int = 0,
+        hasSkinnedMesh: Bool = false,
+        hasBlendShapes: Bool = false,
+        hasSkelAnimation: Bool = false,
+        meshCount: Int = 0,
+        materialCount: Int = 0,
+        pointInstancerCount: Int = 0
+    ) {
+        self.results = results
+        self.detectedUpAxis = detectedUpAxis
+        self.detectedMetersPerUnit = detectedMetersPerUnit
+        self.skeletonJointCount = skeletonJointCount
+        self.maxJointInfluences = maxJointInfluences
+        self.hasSkinnedMesh = hasSkinnedMesh
+        self.hasBlendShapes = hasBlendShapes
+        self.hasSkelAnimation = hasSkelAnimation
+        self.meshCount = meshCount
+        self.materialCount = materialCount
+        self.pointInstancerCount = pointInstancerCount
+    }
+}
+
+public extension USDValidationIssue {
+    static func error(
+        _ message: String,
+        details: String? = nil,
+        primPath: String? = nil,
+        fix: USDFixAction? = nil
+    ) -> USDValidationIssue {
+        USDValidationIssue(
+            severity: .error,
+            message: message,
+            details: details,
+            primPath: primPath,
+            fix: fix
+        )
+    }
+
+    static func warning(
+        _ message: String,
+        details: String? = nil,
+        primPath: String? = nil,
+        fix: USDFixAction? = nil
+    ) -> USDValidationIssue {
+        USDValidationIssue(
+            severity: .warning,
+            message: message,
+            details: details,
+            primPath: primPath,
+            fix: fix
+        )
+    }
+
+    static func info(
+        _ message: String,
+        details: String? = nil,
+        primPath: String? = nil,
+        fix: USDFixAction? = nil
+    ) -> USDValidationIssue {
+        USDValidationIssue(
+            severity: .info,
+            message: message,
+            details: details,
+            primPath: primPath,
+            fix: fix
+        )
+    }
+
+    static func success(_ message: String) -> USDValidationIssue {
+        USDValidationIssue(
+            severity: .success,
+            message: message,
+            details: nil,
+            primPath: nil,
+            fix: nil
+        )
+    }
+}

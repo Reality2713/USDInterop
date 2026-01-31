@@ -14,6 +14,10 @@ let package = Package(
         .library(
             name: "USDInterfaces",
             targets: ["USDInterfaces"]
+        ),
+        .library(
+            name: "USDInteropCxx",
+            targets: ["USDInteropCxx"]
         )
     ],
     dependencies: [
