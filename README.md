@@ -24,22 +24,68 @@ examples.
 - By routing OpenUSD access through USDInterop (and higher-level wrappers),
   we keep most modules pure Swift and reduce build fragility.
 
-## Two-tier model (short)
+## Two-tier model
 
-- **Tier 1: USDInterop (C ABI + tiny Swift wrapper)**
-  - Use in lightweight libraries and shared modules.
-  - Exposes a narrow, stable C interface (see `USDInteropCxx.h`).
-  - Keeps Swift/C++ interop localized and predictable.
-- **Tier 2: App-local SwiftUsd interop**
-  - Use only inside an app-specific interop module/target.
-  - Import `OpenUSD` directly only here.
-  - Never leak C++ types across module boundaries.
-- **Interface layer: USDInterfaces (pure Swift)**
-  - Protocols + DTOs for shared code.
-  - Lets libraries depend on USD behavior without pulling in SwiftUsd.
-- **Optional: USDInteropAdvanced (consolidated Tier 2)**
-  - Shared advanced operations, but only apps should depend on it.
-  - Never a dependency of shared libraries.
+```
+┌────────────────────────────────────────────────────────────────────┐
+│                    TIER 1: USDInterop (This Package)               │
+│   For: Minimal USD queries without full SwiftUsd overhead          │
+├────────────────────────────────────────────────────────────────────┤
+│  USDInterfaces/        Pure Swift DTOs (no OpenUSD dependency)     │
+│  USDInteropCxx/        C++ wrappers via C ABI                      │
+│  USDInterop/           Thin Swift wrappers for C API               │
+│                                                                     │
+│  Current C API surface:                                             │
+│    • usdinterop_export_usda()     - Export stage as USDA text      │
+│    • usdinterop_scene_graph_json() - Get prim hierarchy as JSON    │
+│    • usdinterop_scene_bounds()    - Compute world bounds           │
+│                                                                     │
+│  Use when:                                                          │
+│    ✓ Shared libraries need basic USD queries                       │
+│    ✓ QuickLook extensions or XPC services                          │
+│    ✓ Targets that cannot pay the C++ interop compile cost          │
+│    ✓ You want absolute minimal OpenUSD exposure                    │
+└────────────────────────────────────────────────────────────────────┘
+                              ▼
+┌────────────────────────────────────────────────────────────────────┐
+│             TIER 2: USDInteropAdvanced (Separate Package)          │
+│   For: Full-featured USD operations with SwiftUsd                  │
+├────────────────────────────────────────────────────────────────────┤
+│  USDAdvancedClient     - High-level operations facade              │
+│  USDAdvancedInspection - Validation, statistics, introspection     │
+│  USDAdvancedSurgery    - USD editing (scale, axis, materials, etc) │
+│  USDAdvancedSession*   - Session layer and export workflows        │
+│  AppleUSDSchemasUSD    - RealityKit schema support                 │
+│                                                                     │
+│  Use when:                                                          │
+│    ✓ App-level targets (not shared libraries)                      │
+│    ✓ Need prim traversal, validation, or editing                   │
+│    ✓ Need variant/material/animation surgery                        │
+│    ✓ Need full UsdGeom, UsdShade, UsdSkel APIs                     │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+### When to use which layer
+
+| Scenario | Use |
+|----------|-----|
+| Shared library needs USD file bounds | **Tier 1** C API |
+| App needs to validate USD for RealityKit | **Tier 2** Advanced |
+| QuickLook extension needs prim list | **Tier 1** C API |
+| App needs to apply skeleton remapping | **Tier 2** Advanced |
+| New shared library needs USD metadata | **Tier 1** (add C API if needed) |
+| App needs to combine variants into USDZ | **Tier 2** Advanced |
+
+### Adding new Tier 1 capabilities
+
+If a shared library needs a USD capability not in the C API:
+
+1. Add a C function in `Sources/USDInteropCxx/include/USDInteropCxx.h`
+2. Implement in `Sources/USDInteropCxx/USDInteropCxx.cpp`
+3. Add Swift wrapper in `Sources/USDInterop/USDInterop.swift`
+4. Keep arguments C-friendly (numbers, plain structs, C strings)
+
+Do **not** add SwiftUsd imports to this package.
 
 ## How to use
 
@@ -48,8 +94,8 @@ examples.
 - Higher-level modules should depend on pure-Swift interfaces (clients,
   value types) defined elsewhere.
 - Prefer `USDInterfaces` for shared protocols and DTOs.
-- If you need advanced OpenUSD operations, create an app-local interop
-  target and keep `OpenUSD` imports confined there.
+- If you need advanced OpenUSD operations, depend on `USDInteropAdvanced`
+  (app targets only).
 
 ## Notes
 
