@@ -265,6 +265,23 @@ public struct USDStageMetadata: Equatable, Sendable {
     }
 }
 
+
+public struct USDTransformData: Equatable, Sendable {
+    public var position: SIMD3<Double>
+    public var rotationDegrees: SIMD3<Double>
+    public var scale: SIMD3<Double>
+
+    public init(
+        position: SIMD3<Double> = .zero,
+        rotationDegrees: SIMD3<Double> = .zero,
+        scale: SIMD3<Double> = SIMD3<Double>(repeating: 1)
+    ) {
+        self.position = position
+        self.rotationDegrees = rotationDegrees
+        self.scale = scale
+    }
+}
+
 public struct USDPrimTreeNode: Equatable, Sendable {
     public var primPath: String
     public var primName: String
