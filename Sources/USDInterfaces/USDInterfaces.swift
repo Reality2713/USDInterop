@@ -115,6 +115,24 @@ public enum USDVariantEditTarget: Sendable {
     case rootLayer
 }
 
+/// Generic edit target for authoring opinions into a USD stage.
+///
+/// This is intentionally not variant-specific even though `USDVariantEditTarget` exists,
+/// because multiple editing domains (transforms, bindings, schemas) need the same concept.
+public enum USDLayerEditTarget: Sendable, Equatable {
+    case sessionLayer
+    case rootLayer
+}
+
+public extension USDLayerEditTarget {
+    init(_ target: USDVariantEditTarget) {
+        switch target {
+        case .sessionLayer: self = .sessionLayer
+        case .rootLayer: self = .rootLayer
+        }
+    }
+}
+
 public struct USDSchemaSpec: Sendable, Hashable {
     public enum Kind: Sendable, Hashable {
         case api
@@ -142,6 +160,25 @@ public protocol USDDefaultPrimEditing: Sendable {
 
 public protocol USDPrimTransformEditing: Sendable {
     func setPrimTransform(url: URL, path: String, transform: USDTransformData) throws
+}
+
+public protocol USDMaterialBindingEditing: Sendable {
+    /// Authors a material binding relationship onto `primPath`.
+    ///
+    /// - Important: This must be implemented by `USDInteropAdvanced` (or higher), not in app code.
+    func setMaterialBinding(
+        url: URL,
+        primPath: String,
+        materialPath: String,
+        editTarget: USDLayerEditTarget
+    ) throws
+
+    /// Removes authored material bindings on `primPath`.
+    func clearMaterialBinding(
+        url: URL,
+        primPath: String,
+        editTarget: USDLayerEditTarget
+    ) throws
 }
 
 public protocol USDSchemaApplying: Sendable {
