@@ -103,6 +103,15 @@ void AppendPrimJson(const UsdPrim &prim, std::string &out) {
 }
 } // namespace
 
+namespace USDInterop {
+bool GetAttributeValue(const USD::UsdAttribute &attr, USD::VtValue *value) {
+  if (!value) {
+    return false;
+  }
+  return attr.Get(value, USD::UsdTimeCode::Default());
+}
+} // namespace USDInterop
+
 const char *usdinterop_export_usda(const char *path) {
   if (!path || path[0] == '\0') {
     return nullptr;

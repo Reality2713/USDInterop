@@ -140,6 +140,10 @@ public protocol USDDefaultPrimEditing: Sendable {
     func setDefaultPrim(url: URL, primPath: String) throws
 }
 
+public protocol USDPrimTransformEditing: Sendable {
+    func setPrimTransform(url: URL, path: String, transform: USDTransformData) throws
+}
+
 public protocol USDSchemaApplying: Sendable {
     func applySchema(url: URL, primPath: String, schema: USDSchemaSpec) throws
 }
@@ -224,7 +228,12 @@ public protocol USDVariantCombining: Sendable {
 }
 
 public typealias USDAdvancedInteropProviding =
-    USDPrimListing & USDDefaultPrimEditing & USDSchemaApplying & USDVariantEditing & USDVariantCombining
+    USDPrimListing
+    & USDDefaultPrimEditing
+    & USDPrimTransformEditing
+    & USDSchemaApplying
+    & USDVariantEditing
+    & USDVariantCombining
 
 // MARK: - Inspection & Validation (Swift-only DTOs)
 
