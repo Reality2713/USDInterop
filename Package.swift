@@ -26,7 +26,14 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "USDInterfaces"
+            name: "USDInterfaces",
+            swiftSettings: [
+                // USDInteropAdvanced-binaries is built for distribution, so its compiled code expects
+                // resilient accessors (e.g. `enum case for ...`) from USDInterfaces' public enums.
+                // Enable library evolution so those symbols are emitted when USDInterfaces is built
+                // from source in downstream projects (Xcode/SwiftPM).
+                .unsafeFlags(["-enable-library-evolution"])
+            ]
         ),
         .target(
             name: "USDInteropCxx",
