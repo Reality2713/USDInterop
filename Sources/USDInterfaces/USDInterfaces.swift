@@ -529,6 +529,24 @@ public struct USDMaterialProperty: Equatable, Sendable {
     }
 }
 
+public enum USDMaterialBindingStrength: String, CaseIterable, Equatable, Sendable {
+    /// Authors the default strength sparsely (maps to `UsdShadeTokens->fallbackStrength`).
+    case fallbackStrength
+    case weakerThanDescendants
+    case strongerThanDescendants
+
+    public var displayName: String {
+        switch self {
+        case .fallbackStrength:
+            return "Default"
+        case .weakerThanDescendants:
+            return "Weaker"
+        case .strongerThanDescendants:
+            return "Stronger"
+        }
+    }
+}
+
 public enum USDFeatureOrigin: String, Equatable, Sendable {
     case core = "USD"
     case preliminary = "AR"
