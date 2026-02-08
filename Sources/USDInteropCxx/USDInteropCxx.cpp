@@ -9,11 +9,14 @@
 #include "pxr/pxr.h"
 #include "pxr/usd/usd/attribute.h"
 #include "pxr/usd/usd/prim.h"
+#include "pxr/usd/usd/primCompositionQuery.h"
 #include "pxr/usd/usd/primRange.h"
+#include "pxr/usd/usd/references.h"
 #include "pxr/usd/usd/stage.h"
 #include "pxr/usd/usd/timeCode.h"
 #include "pxr/usd/usdGeom/bboxCache.h"
 #include "pxr/usd/usdGeom/tokens.h"
+#include "pxr/usd/sdf/proxyTypes.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -110,6 +113,24 @@ bool GetAttributeValue(const USD::UsdAttribute &attr, USD::VtValue *value) {
   }
   return attr.Get(value, USD::UsdTimeCode::Default());
 }
+
+bool AddReference(const USD::UsdPrim &prim, const std::string &assetPath,
+                  const std::string &primPath) {
+  if (!prim.IsValid()) {
+    return false;
+  }
+  SdfReference ref(assetPath, primPath.empty() ? SdfPath() : SdfPath(primPath));
+  return prim.GetReferences().AddReference(ref, UsdListPositionFrontOfPrependList);
+}
+
+bool RemoveReference(const USD::UsdPrim &prim, const std::string &assetPath,
+                     const std::string &primPath) {
+  if (!prim.IsValid()) {
+    return false;
+  }
+  SdfReference ref(assetPath, primPath.empty() ? SdfPath() : SdfPath(primPath));
+  return prim.GetReferences().RemoveReference(ref);
+}
 } // namespace USDInterop
 
 const char *usdinterop_export_usda(const char *path) {
@@ -152,6 +173,48 @@ const char *usdinterop_scene_graph_json(const char *path) {
       output += ",";
     }
     AppendPrimJson(child, output);
+    first = false;
+  }
+  output += "]";
+
+  return CopyToCString(output);
+}
+
+const char *usdinterop_prim_references_json(const char *stagePath,
+                                            const char *primPath) {
+  if (!stagePath || stagePath[0] == '\0' || !primPath || primPath[0] == '\0') {
+    return nullptr;
+  }
+
+  UsdStageRefPtr stage = UsdStage::Open(std::string(stagePath));
+  if (!stage) {
+    return nullptr;
+  }
+
+  UsdPrim prim = stage->GetPrimAtPath(SdfPath(primPath));
+  if (!prim.IsValid()) {
+    return nullptr;
+  }
+
+  UsdPrimCompositionQuery query = UsdPrimCompositionQuery::GetDirectReferences(prim);
+  std::vector<UsdPrimCompositionQueryArc> arcs = query.GetCompositionArcs();
+
+  std::string output = "[";
+  bool first = true;
+  for (const auto &arc : arcs) {
+    SdfReferenceEditorProxy editor;
+    SdfReference ref;
+    if (!arc.GetIntroducingListEditor(&editor, &ref)) {
+      continue;
+    }
+    if (!first) {
+      output += ",";
+    }
+    output += "{\"assetPath\":\"";
+    EscapeJson(ref.GetAssetPath(), output);
+    output += "\",\"primPath\":\"";
+    EscapeJson(ref.GetPrimPath().GetString(), output);
+    output += "\"}";
     first = false;
   }
   output += "]";

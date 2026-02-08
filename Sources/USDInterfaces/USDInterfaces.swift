@@ -485,6 +485,16 @@ public struct USDPrimAttributes: Equatable, Sendable {
     }
 }
 
+public struct USDReference: Equatable, Sendable, Hashable {
+    public var assetPath: String
+    public var primPath: String?
+
+    public init(assetPath: String, primPath: String? = nil) {
+        self.assetPath = assetPath
+        self.primPath = primPath
+    }
+}
+
 public struct USDMaterialInfo: Equatable, Sendable {
     public enum MaterialType: String, Equatable, Sendable {
         case previewSurface

@@ -17,6 +17,7 @@ typedef struct {
 
 const char *usdinterop_export_usda(const char *path);
 const char *usdinterop_scene_graph_json(const char *path);
+const char *usdinterop_prim_references_json(const char *stagePath, const char *primPath);
 void usdinterop_free_string(const char *value);
 
 /// Get scene bounds by iterating mesh points

@@ -6,9 +6,11 @@
 #include "pxr/pxr.h"
 #include "pxr/usd/sdf/layer.h"
 #include "pxr/usd/sdf/path.h"
-#include "pxr/usd/usd/editTarget.h"
+#include "pxr/usd/sdf/reference.h"
 #include "pxr/usd/usd/attribute.h"
+#include "pxr/usd/usd/editTarget.h"
 #include "pxr/usd/usd/prim.h"
+#include "pxr/usd/usd/references.h"
 #include "pxr/usd/usd/stage.h"
 #include "pxr/usd/usd/timeCode.h"
 #include "pxr/usd/usd/variantSets.h"
@@ -110,9 +112,17 @@ using Usd_PrimFlagsPredicate = pxr::Usd_PrimFlagsPredicate;
 } // namespace USD
 
 namespace USDInterop {
-/// Swift-facing shim to avoid Swift/C++ interop default-argument deserialization
-/// crashes when calling `UsdAttribute::Get(VtValue*)`.
+/// Swift-facing shim to avoid Swift/C++ interop default-argument
+/// deserialization crashes when calling `UsdAttribute::Get(VtValue*)`.
 bool GetAttributeValue(const USD::UsdAttribute &attr, USD::VtValue *value);
-}
+
+/// Add a reference to a prim.
+bool AddReference(const USD::UsdPrim &prim, const std::string &assetPath,
+                  const std::string &primPath);
+
+/// Remove a reference from a prim.
+bool RemoveReference(const USD::UsdPrim &prim, const std::string &assetPath,
+                     const std::string &primPath);
+} // namespace USDInterop
 
 #endif
