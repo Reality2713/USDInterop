@@ -706,6 +706,7 @@ public enum USDFixAction: Equatable, Sendable {
     case flattenNestedShader(parentPath: String, childPath: String)
     case setTexture(materialPath: String, propertyName: String, textureURL: URL)
     case fixShaderPropertyType(primPath: String, inputName: String, expectedType: String)
+    case inlineMaterialInputs(materialPath: String)
 }
 
 public enum USDValidationSeverity: String, Equatable, Sendable {
