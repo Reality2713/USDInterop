@@ -21,8 +21,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        // Use the same SwiftUsd fork as USDInteropAdvanced to avoid SwiftPM identity conflicts.
-        .package(url: "https://github.com/Reality2713/SwiftUsd.git", branch: "swift-syntax-602")
+        .package(url: "https://github.com/Reality2713/SwiftUsd.git", branch: "main")
     ],
     targets: [
         .target(
