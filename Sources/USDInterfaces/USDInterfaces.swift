@@ -547,6 +547,28 @@ public enum USDMaterialBindingStrength: String, CaseIterable, Equatable, Sendabl
     }
 }
 
+public struct USDMaterialBindingDetails: Equatable, Sendable {
+    public var selectedPrimPath: String
+    public var effectiveMaterialPath: String?
+    public var authoredMaterialPath: String?
+    public var bindingSourcePrimPath: String?
+    public var bindingStrength: USDMaterialBindingStrength?
+
+    public init(
+        selectedPrimPath: String,
+        effectiveMaterialPath: String? = nil,
+        authoredMaterialPath: String? = nil,
+        bindingSourcePrimPath: String? = nil,
+        bindingStrength: USDMaterialBindingStrength? = nil
+    ) {
+        self.selectedPrimPath = selectedPrimPath
+        self.effectiveMaterialPath = effectiveMaterialPath
+        self.authoredMaterialPath = authoredMaterialPath
+        self.bindingSourcePrimPath = bindingSourcePrimPath
+        self.bindingStrength = bindingStrength
+    }
+}
+
 public enum USDFeatureOrigin: String, Equatable, Sendable {
     case core = "USD"
     case preliminary = "AR"
