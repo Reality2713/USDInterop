@@ -4,6 +4,7 @@
 #include "pxr/base/gf/range3d.h"
 #include "pxr/base/gf/vec3d.h"
 #include "pxr/base/gf/vec3f.h"
+#include "pxr/base/plug/registry.h"
 #include "pxr/base/tf/token.h"
 #include "pxr/base/vt/array.h"
 #include "pxr/pxr.h"
@@ -213,4 +214,14 @@ USDInteropBounds usdinterop_scene_bounds(const char *path) {
   }
 
   return result;
+}
+
+int usdinterop_register_plugins(const char *path) {
+  if (!path || path[0] == '\0') {
+    return 0;
+  }
+
+  const PlugPluginPtrVector plugins =
+      PlugRegistry::GetInstance().RegisterPlugins(std::string(path));
+  return static_cast<int>(plugins.size());
 }

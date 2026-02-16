@@ -1,6 +1,19 @@
 import Foundation
 import USDInteropCxx
 
+public enum USDInteropPlugins {
+	public static func registerPlugins(url: URL) -> Int {
+		registerPlugins(path: url.path)
+	}
+
+	@discardableResult
+	public static func registerPlugins(path: String) -> Int {
+		path.withCString { pointer in
+			Int(usdinterop_register_plugins(pointer))
+		}
+	}
+}
+
 public enum USDInteropStage {
 	public static func exportUSDA(url: URL) -> String? {
 		exportUSDA(path: url.path)

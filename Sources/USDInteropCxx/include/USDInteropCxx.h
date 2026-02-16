@@ -22,6 +22,10 @@ void usdinterop_free_string(const char *value);
 /// Get scene bounds by iterating mesh points
 USDInteropBounds usdinterop_scene_bounds(const char *path);
 
+/// Force OpenUSD to scan/register plugins under `path`.
+/// Returns the number of plugins registered by this call.
+int usdinterop_register_plugins(const char *path);
+
 #ifdef __cplusplus
 }
 #endif
