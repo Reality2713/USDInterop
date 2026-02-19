@@ -4,7 +4,8 @@ import PackageDescription
 let package = Package(
     name: "USDInterop",
     platforms: [
-        .macOS(.v26)
+        .macOS(.v26),
+        .visionOS(.v26)
     ],
     products: [
         .library(
