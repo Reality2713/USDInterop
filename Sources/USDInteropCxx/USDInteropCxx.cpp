@@ -18,6 +18,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <filesystem>
 #include <limits>
 #include <string>
 
@@ -175,9 +176,26 @@ USDInteropBounds usdinterop_scene_bounds(const char *path) {
     return result;
   }
 
-  UsdStageRefPtr stage = UsdStage::Open(std::string(path));
+  const std::string stagePath(path);
+  const bool isSessionLayer =
+      std::filesystem::path(stagePath).filename() == "session.usda";
+
+  if (isSessionLayer) {
+    try {
+      std::filesystem::last_write_time(
+          stagePath, std::filesystem::file_time_type::clock::now());
+    } catch (...) {
+      // Best-effort cache-bust for session layers.
+    }
+  }
+
+  UsdStageRefPtr stage = UsdStage::Open(stagePath);
   if (!stage) {
     return result;
+  }
+
+  if (isSessionLayer) {
+    stage->Reload();
   }
 
   // Use UsdGeomBBoxCache for proper bounds calculation
