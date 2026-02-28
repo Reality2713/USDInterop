@@ -195,7 +195,9 @@ USDInteropBounds usdinterop_scene_bounds(const char *path) {
   }
 
   if (isSessionLayer) {
-    stage->Reload();
+    // Avoid reloading immediately after opening session.usda.
+    // Open() already reflects current on-disk state, and a forced Reload()
+    // has been observed to crash intermittently during startup.
   }
 
   // Use UsdGeomBBoxCache for proper bounds calculation
