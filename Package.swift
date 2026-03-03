@@ -50,7 +50,11 @@ let package = Package(
             name: "USDInterop",
             dependencies: [
                 "USDInterfaces",
-                "USDInteropCxx"
+                "USDInteropCxx",
+                .product(name: "OpenUSD", package: "SwiftUsd")
+            ],
+            swiftSettings: [
+                .interoperabilityMode(.Cxx)
             ]
         )
     ],
