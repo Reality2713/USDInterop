@@ -2,6 +2,27 @@ import OpenUSD
 
 public enum USDInteropOpenUSDShim {
     @inline(__always)
+    public static func dereferenceStage(
+        _ stage: pxrInternal_v0_26_3__pxrReserved__.UsdStageRefPtr
+    ) -> pxrInternal_v0_26_3__pxrReserved__.UsdStage {
+        OpenUSD.Overlay.Dereference(stage)
+    }
+
+    @inline(__always)
+    public static func dereferenceLayer(
+        _ layer: pxrInternal_v0_26_3__pxrReserved__.SdfLayerHandle
+    ) -> pxrInternal_v0_26_3__pxrReserved__.SdfLayer {
+        OpenUSD.Overlay.Dereference(layer)
+    }
+
+    @inline(__always)
+    public static func dereferenceLayer(
+        _ layer: pxrInternal_v0_26_3__pxrReserved__.SdfLayerRefPtr
+    ) -> pxrInternal_v0_26_3__pxrReserved__.SdfLayer {
+        OpenUSD.Overlay.Dereference(layer)
+    }
+
+    @inline(__always)
     public static func sdfCopySpec(
         from srcLayer: pxrInternal_v0_26_3__pxrReserved__.SdfLayerHandle,
         srcPath: pxrInternal_v0_26_3__pxrReserved__.SdfPath,
