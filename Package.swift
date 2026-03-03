@@ -22,7 +22,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/Reality2713/SwiftUsd.git", branch: "codex/swiftusd6-rebase")
+        .package(url: "https://github.com/Reality2713/SwiftUsd.git", from: "6.0.0")
     ],
     targets: [
         .target(
