@@ -6,7 +6,7 @@ avoid Swift module deserialization issues in Release, and keep build settings
 consistent across the app and tools.
 
 USDInterop is the **Tier 1** of a two-tier interop model. Tier 2 (advanced
-SwiftUsd usage) must live inside each app, not in shared libraries.
+tooling) should build on this shim for low-level OpenUSD operations.
 
 `USDInterfaces` is a pure-Swift companion module that defines reusable
 protocols and DTOs for shared libraries.
@@ -39,6 +39,7 @@ examples.
 │    • usdinterop_export_usda()     - Export stage as USDA text      │
 │    • usdinterop_scene_graph_json() - Get prim hierarchy as JSON    │
 │    • usdinterop_scene_bounds()    - Compute world bounds           │
+│    • USDInteropOpenUSDShim.sdfCopySpec() - Layer spec copy bridge  │
 │                                                                     │
 │  Use when:                                                          │
 │    ✓ Shared libraries need basic USD queries                       │
