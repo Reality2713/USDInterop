@@ -5,6 +5,7 @@
 #include "pxr/base/gf/vec3d.h"
 #include "pxr/base/gf/vec3f.h"
 #include "pxr/base/plug/registry.h"
+#include "pxr/base/plug/plugin.h"
 #include "pxr/base/tf/token.h"
 #include "pxr/base/vt/array.h"
 #include "pxr/pxr.h"
@@ -13,6 +14,7 @@
 #include "pxr/usd/usd/primRange.h"
 #include "pxr/usd/usd/stage.h"
 #include "pxr/usd/usd/timeCode.h"
+#include "pxr/usd/sdf/fileFormat.h"
 #include "pxr/usd/usdGeom/bboxCache.h"
 #include "pxr/usd/usdGeom/tokens.h"
 
@@ -243,5 +245,21 @@ int usdinterop_register_plugins(const char *path) {
 
   const PlugPluginPtrVector plugins =
       PlugRegistry::GetInstance().RegisterPlugins(std::string(path));
+
+  for (const PlugPluginPtr &plugin : plugins) {
+    if (plugin) {
+      plugin->Load();
+    }
+  }
+
   return static_cast<int>(plugins.size());
+}
+
+int usdinterop_has_file_format(const char *format_id) {
+  if (!format_id || format_id[0] == '\0') {
+    return 0;
+  }
+
+  const TfToken token(format_id);
+  return SdfFileFormat::FindById(token) ? 1 : 0;
 }

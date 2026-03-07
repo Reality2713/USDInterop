@@ -26,6 +26,10 @@ USDInteropBounds usdinterop_scene_bounds(const char *path);
 /// Returns the number of plugins registered by this call.
 int usdinterop_register_plugins(const char *path);
 
+/// Force OpenUSD to resolve a file format by id (for example: "ply", "gltf").
+/// Returns 1 when the file format is available, otherwise 0.
+int usdinterop_has_file_format(const char *format_id);
+
 #ifdef __cplusplus
 }
 #endif

@@ -12,6 +12,12 @@ public enum USDInteropPlugins {
 			Int(usdinterop_register_plugins(pointer))
 		}
 	}
+
+	public static func hasFileFormat(_ formatID: String) -> Bool {
+		formatID.withCString { pointer in
+			usdinterop_has_file_format(pointer) != 0
+		}
+	}
 }
 
 public enum USDInteropStage {
