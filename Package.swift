@@ -56,6 +56,15 @@ let package = Package(
             swiftSettings: [
                 .interoperabilityMode(.Cxx)
             ]
+        ),
+        .testTarget(
+            name: "USDInteropTests",
+            dependencies: [
+                "USDInterop"
+            ],
+            swiftSettings: [
+                .interoperabilityMode(.Cxx)
+            ]
         )
     ],
     cxxLanguageStandard: .gnucxx17

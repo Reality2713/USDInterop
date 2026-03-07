@@ -27,6 +27,16 @@
 PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
+bool StartsWithPathPrefix(const std::string &value, const std::string &prefix) {
+  if (prefix.empty()) {
+    return false;
+  }
+  if (value.size() < prefix.size()) {
+    return false;
+  }
+  return value.compare(0, prefix.size(), prefix) == 0;
+}
+
 const char *CopyToCString(const std::string &value) {
   char *buffer = static_cast<char *>(std::malloc(value.size() + 1));
   if (!buffer) {
@@ -243,11 +253,27 @@ int usdinterop_register_plugins(const char *path) {
     return 0;
   }
 
+  const std::string rootPath(path);
   const PlugPluginPtrVector plugins =
-      PlugRegistry::GetInstance().RegisterPlugins(std::string(path));
+      PlugRegistry::GetInstance().RegisterPlugins(rootPath);
 
   for (const PlugPluginPtr &plugin : plugins) {
     if (plugin) {
+      plugin->Load();
+    }
+  }
+
+  const PlugPluginPtrVector allPlugins =
+      PlugRegistry::GetInstance().GetAllPlugins();
+  for (const PlugPluginPtr &plugin : allPlugins) {
+    if (!plugin) {
+      continue;
+    }
+
+    const std::string &pluginPath = plugin->GetPath();
+    const std::string &resourcePath = plugin->GetResourcePath();
+    if (StartsWithPathPrefix(pluginPath, rootPath) ||
+        StartsWithPathPrefix(resourcePath, rootPath)) {
       plugin->Load();
     }
   }
