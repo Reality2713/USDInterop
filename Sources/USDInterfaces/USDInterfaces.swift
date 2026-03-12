@@ -723,6 +723,7 @@ public enum USDFixAction: Equatable, Sendable {
     case assignMaterial(primPath: String, materialPath: String)
     case cleanupMissingReference(filePath: String)
     case applyMissingSchema(primPath: String, schemaName: String)
+    case setGeomSubsetFamilyType(primPath: String, familyName: String, familyType: String)
     case setDoubleSided(primPath: String, value: Bool)
     case setSubdivisionScheme(primPath: String, scheme: String)
     case flattenNestedShader(parentPath: String, childPath: String)
