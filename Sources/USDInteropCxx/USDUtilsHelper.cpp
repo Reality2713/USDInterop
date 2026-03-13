@@ -108,8 +108,10 @@ bool RewriteAttributeSpecTypeToString(const USD::SdfLayerHandle &layer,
     }
   }
 
-  attrSpec->ClearDefaultValue();
-  layer->RemovePropertyIfHasOnlyRequiredFields(attrSpec);
+  owner->RemoveProperty(attrSpec);
+  if (layer->GetAttributeAtPath(attrPath)) {
+    return false;
+  }
 
   pxr::SdfAttributeSpecHandle rewritten = pxr::SdfAttributeSpec::New(
       owner,
