@@ -1,5 +1,6 @@
 
 #include "USDUtilsHelper.hpp"
+#include "pxr/base/tf/token.h"
 #include <exception>
 
 // Thread-local cache for unresolved paths
@@ -73,3 +74,57 @@ bool CreateUsdzPackageNative(const std::string &assetPath,
     return false;
   }
 }
+
+namespace USDInterop {
+bool RewriteAttributeSpecTypeToString(const USD::SdfLayerHandle &layer,
+                                      const USD::SdfPath &attrPath) {
+  if (!layer) {
+    return false;
+  }
+
+  pxr::SdfAttributeSpecHandle attrSpec = layer->GetAttributeAtPath(attrPath);
+  if (!attrSpec) {
+    return false;
+  }
+
+  pxr::SdfPrimSpecHandle owner = layer->GetPrimAtPath(attrPath.GetPrimPath());
+  if (!owner) {
+    return false;
+  }
+
+  const pxr::SdfVariability variability = attrSpec->GetVariability();
+  const bool isCustom = attrSpec->IsCustom();
+
+  bool hasDefaultValue = attrSpec->HasDefaultValue();
+  std::string defaultStringValue;
+  if (hasDefaultValue) {
+    const pxr::VtValue defaultValue = attrSpec->GetDefaultValue();
+    if (defaultValue.IsHolding<std::string>()) {
+      defaultStringValue = defaultValue.UncheckedGet<std::string>();
+    } else if (defaultValue.IsHolding<pxr::TfToken>()) {
+      defaultStringValue = defaultValue.UncheckedGet<pxr::TfToken>().GetString();
+    } else {
+      hasDefaultValue = false;
+    }
+  }
+
+  attrSpec->ClearDefaultValue();
+  layer->RemovePropertyIfHasOnlyRequiredFields(attrSpec);
+
+  pxr::SdfAttributeSpecHandle rewritten = pxr::SdfAttributeSpec::New(
+      owner,
+      attrPath.GetName(),
+      pxr::SdfValueTypeNames->String,
+      variability,
+      isCustom);
+  if (!rewritten) {
+    return false;
+  }
+
+  if (hasDefaultValue) {
+    rewritten->SetDefaultValue(pxr::VtValue(defaultStringValue));
+  }
+
+  return true;
+}
+} // namespace USDInterop

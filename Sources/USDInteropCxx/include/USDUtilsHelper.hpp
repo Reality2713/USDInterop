@@ -6,6 +6,7 @@
 #include "pxr/pxr.h"
 #include "pxr/usd/sdf/layer.h"
 #include "pxr/usd/sdf/path.h"
+#include "pxr/usd/sdf/attributeSpec.h"
 #include "pxr/usd/usd/editTarget.h"
 #include "pxr/usd/usd/attribute.h"
 #include "pxr/usd/usd/prim.h"
@@ -113,6 +114,11 @@ namespace USDInterop {
 /// Swift-facing shim to avoid Swift/C++ interop default-argument deserialization
 /// crashes when calling `UsdAttribute::Get(VtValue*)`.
 bool GetAttributeValue(const USD::UsdAttribute &attr, USD::VtValue *value);
+
+/// Rewrites an authored attribute spec in a layer to `string`, preserving the
+/// current default value when it is authored as `string` or `token`.
+bool RewriteAttributeSpecTypeToString(const USD::SdfLayerHandle &layer,
+                                      const USD::SdfPath &attrPath);
 }
 
 #endif
