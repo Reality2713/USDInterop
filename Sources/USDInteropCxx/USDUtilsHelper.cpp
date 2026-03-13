@@ -129,4 +129,43 @@ bool RewriteAttributeSpecTypeToString(const USD::SdfLayerHandle &layer,
 
   return true;
 }
+
+int RewriteAllTokenAttributeSpecsToString(const USD::SdfLayerHandle &layer,
+                                          const std::string &propertyName) {
+  if (!layer || propertyName.empty()) {
+    return 0;
+  }
+
+  const pxr::TfToken propertyToken(propertyName);
+  std::vector<pxr::SdfPath> pathsToRewrite;
+  layer->Traverse(pxr::SdfPath::AbsoluteRootPath(),
+                  [&](const pxr::SdfPath &path) {
+                    if (!path.IsPropertyPath()) {
+                      return;
+                    }
+                    if (path.GetNameToken() != propertyToken) {
+                      return;
+                    }
+
+                    const pxr::SdfAttributeSpecHandle attrSpec =
+                        layer->GetAttributeAtPath(path);
+                    if (!attrSpec) {
+                      return;
+                    }
+                    if (attrSpec->GetTypeName() != pxr::SdfValueTypeNames->Token) {
+                      return;
+                    }
+
+                    pathsToRewrite.push_back(path);
+                  });
+
+  int rewrittenCount = 0;
+  for (const pxr::SdfPath &path : pathsToRewrite) {
+    if (RewriteAttributeSpecTypeToString(layer, path)) {
+      ++rewrittenCount;
+    }
+  }
+
+  return rewrittenCount;
+}
 } // namespace USDInterop

@@ -119,6 +119,11 @@ bool GetAttributeValue(const USD::UsdAttribute &attr, USD::VtValue *value);
 /// current default value when it is authored as `string` or `token`.
 bool RewriteAttributeSpecTypeToString(const USD::SdfLayerHandle &layer,
                                       const USD::SdfPath &attrPath);
+
+/// Rewrites all authored attribute specs in the layer with the given property
+/// name from token to string. Returns the number of rewritten specs.
+int RewriteAllTokenAttributeSpecsToString(const USD::SdfLayerHandle &layer,
+                                          const std::string &propertyName);
 }
 
 #endif
