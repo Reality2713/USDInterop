@@ -732,13 +732,16 @@ public enum USDFixAction: Equatable, Sendable {
     case addUVs(primPath: String)
     case assignMaterial(primPath: String, materialPath: String)
     case cleanupMissingReference(filePath: String)
+    case removeInvalidMaterialBindingProperties(primPath: String)
     case applyMissingSchema(primPath: String, schemaName: String)
+    case setGeomSubsetFamilyName(primPath: String, familyName: String)
     case setGeomSubsetFamilyType(primPath: String, familyName: String, familyType: String)
     case setDoubleSided(primPath: String, value: Bool)
     case setSubdivisionScheme(primPath: String, scheme: String)
     case flattenNestedShader(parentPath: String, childPath: String)
     case setTexture(materialPath: String, propertyName: String, textureURL: URL)
     case fixShaderPropertyType(primPath: String, inputName: String, expectedType: String)
+    case normalizeNormalMapTexture(shaderPath: String)
     case inlineMaterialInputs(materialPath: String)
 }
 
