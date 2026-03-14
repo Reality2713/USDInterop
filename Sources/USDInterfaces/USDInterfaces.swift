@@ -734,6 +734,7 @@ public enum USDFixAction: Equatable, Sendable {
     case cleanupMissingReference(filePath: String)
     case removeInvalidMaterialBindingProperties(primPath: String)
     case applyMissingSchema(primPath: String, schemaName: String)
+    case removeAppliedSchema(primPath: String, schemaName: String)
     case setGeomSubsetFamilyName(primPath: String, familyName: String)
     case setGeomSubsetFamilyType(primPath: String, familyName: String, familyType: String)
     case setDoubleSided(primPath: String, value: Bool)
