@@ -507,15 +507,25 @@ public struct USDMaterialInfo: Equatable, Sendable {
 
 public struct USDMaterialProperty: Equatable, Sendable {
     public enum PropertyType: String, Equatable, Sendable {
+        case bool
         case color
         case float
+        case int
+        case string
         case texture
+        case token
+        case unsupported
     }
 
     public enum PropertyValue: Equatable, Sendable {
+        case bool(Bool)
         case color(r: Float, g: Float, b: Float)
         case float(Float)
+        case int(Int)
+        case string(String)
         case texture(url: String, resolvedPath: String?)
+        case token(String)
+        case unsupported(typeName: String, valueDescription: String)
     }
 
     public var name: String
