@@ -1,4 +1,5 @@
 import OpenUSD
+import USDInteropCxx
 
 public enum USDInteropOpenUSDShim {
     @inline(__always)
@@ -31,4 +32,15 @@ public enum USDInteropOpenUSDShim {
     ) -> Bool {
         pxrInternal_v0_26_3__pxrReserved__.SdfCopySpec(srcLayer, srcPath, dstLayer, dstPath)
     }
+
+    /// Swift-facing shim for `UsdAttribute::Get(VtValue*)` that avoids
+    /// Swift/C++ interop SIL deserialization crashes in Release/Archive builds.
+    @inline(__always)
+    public static func getAttributeValue(
+        _ attr: pxrInternal_v0_26_3__pxrReserved__.UsdAttribute,
+        _ value: UnsafeMutablePointer<pxrInternal_v0_26_3__pxrReserved__.VtValue>
+    ) -> Bool {
+        USDInteropCxx.USDInterop.GetAttributeValue(attr, value)
+    }
 }
+
