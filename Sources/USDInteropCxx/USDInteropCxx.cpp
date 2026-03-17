@@ -9,6 +9,7 @@
 #include "pxr/base/tf/token.h"
 #include "pxr/base/vt/array.h"
 #include "pxr/pxr.h"
+#include "pxr/usd/sdf/copyUtils.h"
 #include "pxr/usd/usd/attribute.h"
 #include "pxr/usd/usd/prim.h"
 #include "pxr/usd/usd/primRange.h"
@@ -123,6 +124,16 @@ bool GetAttributeValue(const USD::UsdAttribute &attr, USD::VtValue *value) {
     return false;
   }
   return attr.Get(value, USD::UsdTimeCode::Default());
+}
+
+bool CopySpecFromLayerRefPtr(const USD::SdfLayerRefPtr &srcLayer,
+                             const USD::SdfPath &srcPath,
+                             const USD::SdfLayerHandle &dstLayer,
+                             const USD::SdfPath &dstPath) {
+  if (!srcLayer || !dstLayer) {
+    return false;
+  }
+  return SdfCopySpec(srcLayer, srcPath, dstLayer, dstPath);
 }
 } // namespace USDInterop
 

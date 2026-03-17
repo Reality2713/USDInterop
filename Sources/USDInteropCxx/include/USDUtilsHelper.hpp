@@ -88,6 +88,7 @@ using VtValue = pxr::VtValue;
 using UsdTimeCode = pxr::UsdTimeCode;
 using UsdAttribute = pxr::UsdAttribute;
 using SdfLayerHandle = pxr::SdfLayerHandle;
+using SdfLayerRefPtr = pxr::SdfLayerRefPtr;
 using SdfLayer = pxr::SdfLayer;
 using UsdEditTarget = pxr::UsdEditTarget;
 using UsdVariantSets = pxr::UsdVariantSets;
@@ -124,6 +125,14 @@ bool RewriteAttributeSpecTypeToString(const USD::SdfLayerHandle &layer,
 /// name from token to string. Returns the number of rewritten specs.
 int RewriteAllTokenAttributeSpecsToString(const USD::SdfLayerHandle &layer,
                                           const std::string &propertyName);
+
+/// Copies a spec from a ref-counted source layer into a destination layer
+/// handle. This lets C++ perform the ref->weak conversion that Swift interop
+/// does not expose directly.
+bool CopySpecFromLayerRefPtr(const USD::SdfLayerRefPtr &srcLayer,
+                             const USD::SdfPath &srcPath,
+                             const USD::SdfLayerHandle &dstLayer,
+                             const USD::SdfPath &dstPath);
 }
 
 #endif
