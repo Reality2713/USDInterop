@@ -741,9 +741,47 @@ public enum USDFixAction: Equatable, Sendable {
     case setSubdivisionScheme(primPath: String, scheme: String)
     case flattenNestedShader(parentPath: String, childPath: String)
     case setTexture(materialPath: String, propertyName: String, textureURL: URL)
-    case fixShaderPropertyType(primPath: String, inputName: String, expectedType: String)
+    case fixShaderPropertyType(primPath: String, inputName: String, expectedType: USDShaderValueType)
     case normalizeNormalMapTexture(shaderPath: String)
     case inlineMaterialInputs(materialPath: String)
+}
+
+public enum USDShaderValueType: Equatable, Hashable, Sendable {
+    case string
+    case token
+    case unknown(raw: String)
+
+    public init(_ rawValue: String?) {
+        let trimmed = rawValue?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        switch trimmed.lowercased() {
+        case "string":
+            self = .string
+        case "token":
+            self = .token
+        default:
+            self = .unknown(raw: trimmed)
+        }
+    }
+
+    public var rawValue: String {
+        switch self {
+        case .string:
+            return "string"
+        case .token:
+            return "token"
+        case .unknown(let raw):
+            return raw
+        }
+    }
+
+    public var isKnown: Bool {
+        switch self {
+        case .string, .token:
+            return true
+        case .unknown:
+            return false
+        }
+    }
 }
 
 public enum USDValidationSeverity: String, Equatable, Sendable {
