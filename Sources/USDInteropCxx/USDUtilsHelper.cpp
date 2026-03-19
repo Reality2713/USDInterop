@@ -54,17 +54,11 @@ std::string GetUnresolvedPath(int index) {
 void ClearUnresolvedCache() { g_unresolvedCache.clear(); }
 
 bool CreateUsdzPackageNative(const std::string &assetPath,
-                             const std::string &outputPath,
-                             bool arkitCompatible) {
+                             const std::string &outputPath) {
   try {
     SdfAssetPath sdfAssetPath(assetPath);
-
     // Empty string for file comment, false for checkCompliance (we do our own
     // validation)
-    if (arkitCompatible) {
-      return UsdUtilsCreateNewARKitUsdzPackage(sdfAssetPath, outputPath,
-                                               std::string(), false);
-    }
     return UsdUtilsCreateNewUsdzPackage(sdfAssetPath, outputPath, std::string(),
                                         false);
   } catch (const std::exception &e) {

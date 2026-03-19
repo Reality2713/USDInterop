@@ -48,34 +48,16 @@ std::string GetUnresolvedPath(int index);
 /// Clear cached unresolved paths
 void ClearUnresolvedCache();
 
-/// Creates a USDZ package using native OpenUSD API
+/// Creates a USDZ package using the current native OpenUSD API.
+///
+/// This always uses `UsdUtilsCreateNewUsdzPackage`, which preserves authored
+/// stage metadata such as `metersPerUnit` and `upAxis`.
 ///
 /// @param assetPath Path to the source USD asset (usda/usdc)
 /// @param outputPath Path for the output USDZ file
-/// @param arkitCompatible Controls which OpenUSD packaging function is used:
-///
-/// ## arkitCompatible = false (RECOMMENDED for Preflight)
-/// Uses `UsdUtilsCreateNewUsdzPackage`:
-/// - Preserves original stage metadata (metersPerUnit, upAxis)
-/// - Bundles all dependencies into the USDZ archive
-/// - No automatic unit/scale normalization
-///
-/// ## arkitCompatible = true
-/// Uses `UsdUtilsCreateNewARKitUsdzPackage`:
-/// - Designed for Apple ARKit/RealityKit compatibility
-/// - **NORMALIZES metersPerUnit to 1.0** (meters) during packaging
-/// - May apply additional ARKit-specific optimizations
-/// - Use ONLY when you want geometry scaled to meters
-///
-/// @warning The ARKit variant changes your model's scale! A model with
-///          metersPerUnit=0.01 (centimeters) will be converted to 1.0 (meters),
-///          making it appear 100x larger when loaded in apps that respect
-///          metersPerUnit.
-///
 /// @return true on success, false on failure
 bool CreateUsdzPackageNative(const std::string &assetPath,
-                             const std::string &outputPath,
-                             bool arkitCompatible);
+                             const std::string &outputPath);
 
 // Clean namespaced aliases for Swift to bypass 'pxr' shadowing
 namespace USD {
