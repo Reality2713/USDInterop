@@ -22,7 +22,7 @@ builds and Release-only deserialization failures.
            ▼                │                ▼
 ┌──────────────────────┐    │    ┌─────────────────────────────┐
 │  Use TIER 1 only:    │    │    │  Can use TIER 2:            │
-│  • USDInterfaces     │    │    │  • USDInteropAdvanced       │
+│  • USDInterfaces     │    │    │  • USDTools                │
 │  • USDInterop (C API)│    │    │  • Direct OpenUSD if needed │
 └──────────────────────┘    │    └─────────────────────────────┘
            │                │
@@ -49,7 +49,7 @@ builds and Release-only deserialization failures.
 - Stable, narrow surface area.
 - Current API: `sceneBounds`, `exportUSDA`, `sceneGraphJSON`
 
-**Tier 2 (USDInteropAdvanced):**
+**Tier 2 (USDTools):**
 - Depends on `OpenUSD` (SwiftUsd) directly.
 - Contains advanced OpenUSD operations (UsdGeom, Sdf, validation, surgery).
 - Must not be depended on by shared libraries.
@@ -67,7 +67,7 @@ builds and Release-only deserialization failures.
 - If a shared library needs USD data, use Tier 1 APIs or add a new C ABI
   function to USDInterop.
 - If a feature truly requires advanced OpenUSD, implement it **only** in the
-  app-local interop target or use `USDInteropAdvanced` in app targets.
+  app-local interop target or use `USDTools` in app targets.
 - Shared libraries should depend on `USDInterfaces` for reusable protocols.
 
 ## Decision checklist for changes
@@ -79,7 +79,7 @@ builds and Release-only deserialization failures.
 3. If not, can a minimal C ABI function be added safely?
    - Yes -> add to `USDInteropCxx` + Swift wrapper.
 4. Only if it requires advanced OpenUSD APIs:
-   - Keep it in the app-local interop target or `USDInteropAdvanced`.
+   - Keep it in the app-local interop target or `USDTools`.
 
 ## Examples
 

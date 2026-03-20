@@ -10,7 +10,7 @@ tooling) should build on this shim for low-level OpenUSD operations.
 
 `USDInterfaces` is a pure-Swift companion module that defines reusable
 protocols and DTOs for shared libraries.
-`USDInteropAdvanced` is the consolidated Tier 2 package (app-only), if you
+`USDTools` is the consolidated Tier 2 package (app-only), if you
 choose to reuse advanced operations across apps.
 
 See `docs/TWO_TIER_INTEROP.md` for the full rules, decision checklist, and
@@ -49,7 +49,7 @@ examples.
 └────────────────────────────────────────────────────────────────────┘
                               ▼
 ┌────────────────────────────────────────────────────────────────────┐
-│             TIER 2: USDInteropAdvanced (Separate Package)          │
+│                 TIER 2: USDTools (Separate Package)                │
 │   For: Full-featured USD operations with SwiftUsd                  │
 ├────────────────────────────────────────────────────────────────────┤
 │  USDAdvancedClient     - High-level operations facade              │
@@ -95,7 +95,7 @@ Do **not** add SwiftUsd imports to this package.
 - Higher-level modules should depend on pure-Swift interfaces (clients,
   value types) defined elsewhere.
 - Prefer `USDInterfaces` for shared protocols and DTOs.
-- If you need advanced OpenUSD operations, depend on `USDInteropAdvanced`
+- If you need advanced OpenUSD operations, depend on `USDTools`
   (app targets only).
 
 ## Notes

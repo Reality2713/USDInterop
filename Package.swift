@@ -28,7 +28,7 @@ let package = Package(
         .target(
             name: "USDInterfaces",
             swiftSettings: [
-                // USDInteropAdvanced-binaries is built for distribution, so its compiled code expects
+                // The higher-level USD tools package is built for distribution, so its compiled code expects
                 // resilient accessors (e.g. `enum case for ...`) from USDInterfaces' public enums.
                 // Enable library evolution so those symbols are emitted when USDInterfaces is built
                 // from source in downstream projects (Xcode/SwiftPM).

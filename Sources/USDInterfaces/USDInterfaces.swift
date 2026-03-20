@@ -165,7 +165,7 @@ public protocol USDPrimTransformEditing: Sendable {
 public protocol USDMaterialBindingEditing: Sendable {
     /// Authors a material binding relationship onto `primPath`.
     ///
-    /// - Important: This must be implemented by `USDInteropAdvanced` (or higher), not in app code.
+    /// - Important: This must be implemented by `USDTools` (or higher), not in app code.
     func setMaterialBinding(
         url: URL,
         primPath: String,
