@@ -317,7 +317,7 @@ public struct USDOperationsClient: Sendable {
                 Float(transform.rotationDegrees.y),
                 Float(transform.rotationDegrees.z)
             ),
-            UsdGeomXformCommonAPI.RotationOrderXYZ,
+            unsafeBitCast(Int32(0), to: UsdGeomXformCommonAPI.RotationOrder.self),
             UsdTimeCode.Default()
         )
         let didScale = xformCommon.SetScale(
