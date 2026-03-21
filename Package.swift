@@ -13,6 +13,10 @@ let package = Package(
             targets: ["USDInterop"]
         ),
         .library(
+            name: "USDOperations",
+            targets: ["USDOperations"]
+        ),
+        .library(
             name: "USDInterfaces",
             targets: ["USDInterfaces"]
         ),
@@ -57,10 +61,23 @@ let package = Package(
                 .interoperabilityMode(.Cxx)
             ]
         ),
+        .target(
+            name: "USDOperations",
+            dependencies: [
+                "USDInterfaces",
+                "USDInterop",
+                "USDInteropCxx",
+                .product(name: "OpenUSD", package: "SwiftUsd")
+            ],
+            swiftSettings: [
+                .interoperabilityMode(.Cxx)
+            ]
+        ),
         .testTarget(
             name: "USDInteropTests",
             dependencies: [
-                "USDInterop"
+                "USDInterop",
+                "USDOperations"
             ],
             swiftSettings: [
                 .interoperabilityMode(.Cxx)

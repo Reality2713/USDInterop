@@ -23,6 +23,16 @@ public struct USDSceneBounds: Sendable, Hashable {
     }
 }
 
+public struct USDReference: Equatable, Sendable {
+    public var assetPath: String
+    public var primPath: String?
+
+    public init(assetPath: String, primPath: String? = nil) {
+        self.assetPath = assetPath
+        self.primPath = primPath
+    }
+}
+
 public protocol USDAExporting: Sendable {
     func exportUSDA(url: URL) -> String?
 }
