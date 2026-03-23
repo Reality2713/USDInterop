@@ -77,3 +77,73 @@ public enum USDInteropStage {
 		)
 	}
 }
+
+public enum USDInteropPackagePaths {
+	private static func stringResult(
+		_ body: () -> UnsafePointer<CChar>?
+	) -> String? {
+		guard let result = body() else { return nil }
+		defer { usdinterop_free_string(result) }
+		return String(cString: result)
+	}
+
+	public static func isPackageRelativePath(_ path: String) -> Bool {
+		path.withCString { pointer in
+			usdinterop_is_package_relative_path(pointer) != 0
+		}
+	}
+
+	public static func splitOuter(_ path: String) -> (packagePath: String, packagedPath: String)? {
+		guard isPackageRelativePath(path) else { return nil }
+		let packagePath = path.withCString { pointer in
+			stringResult {
+				usdinterop_split_package_relative_path_outer_package(pointer)
+			}
+		}
+		let packagedPath = path.withCString { pointer in
+			stringResult {
+				usdinterop_split_package_relative_path_outer_packaged(pointer)
+			}
+		}
+		guard let packagePath, let packagedPath else { return nil }
+		return (packagePath, packagedPath)
+	}
+
+	public static func splitInner(_ path: String) -> (packagePath: String, packagedPath: String)? {
+		guard isPackageRelativePath(path) else { return nil }
+		let packagePath = path.withCString { pointer in
+			stringResult {
+				usdinterop_split_package_relative_path_inner_package(pointer)
+			}
+		}
+		let packagedPath = path.withCString { pointer in
+			stringResult {
+				usdinterop_split_package_relative_path_inner_packaged(pointer)
+			}
+		}
+		guard let packagePath, let packagedPath else { return nil }
+		return (packagePath, packagedPath)
+	}
+
+	public static func join(packagePath: String, packagedPath: String) -> String? {
+		packagePath.withCString { outer in
+			packagedPath.withCString { inner in
+				stringResult {
+					usdinterop_join_package_relative_path(outer, inner)
+				}
+			}
+		}
+	}
+
+	public static func innermostPackagedPath(_ path: String) -> String {
+		var current = path
+			.replacingOccurrences(of: "@", with: "")
+			.trimmingCharacters(in: .whitespacesAndNewlines)
+
+		while let split = splitInner(current) {
+			current = split.packagedPath
+		}
+
+		return current.trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
+	}
+}

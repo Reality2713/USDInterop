@@ -30,6 +30,24 @@ int usdinterop_register_plugins(const char *path);
 /// Returns 1 when the file format is available, otherwise 0.
 int usdinterop_has_file_format(const char *format_id);
 
+/// Returns 1 when the path is package-relative per Ar package-path rules.
+int usdinterop_is_package_relative_path(const char *path);
+
+/// Splits the outermost package-relative path and returns the package path.
+const char *usdinterop_split_package_relative_path_outer_package(const char *path);
+
+/// Splits the outermost package-relative path and returns the packaged path.
+const char *usdinterop_split_package_relative_path_outer_packaged(const char *path);
+
+/// Splits the innermost package-relative path and returns the package path.
+const char *usdinterop_split_package_relative_path_inner_package(const char *path);
+
+/// Splits the innermost package-relative path and returns the packaged path.
+const char *usdinterop_split_package_relative_path_inner_packaged(const char *path);
+
+/// Joins a package path and packaged path using canonical Ar rules.
+const char *usdinterop_join_package_relative_path(const char *package_path, const char *packaged_path);
+
 #ifdef __cplusplus
 }
 #endif

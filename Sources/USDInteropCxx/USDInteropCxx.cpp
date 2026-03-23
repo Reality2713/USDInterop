@@ -9,6 +9,7 @@
 #include "pxr/base/tf/token.h"
 #include "pxr/base/vt/array.h"
 #include "pxr/pxr.h"
+#include "pxr/usd/ar/packageUtils.h"
 #include "pxr/usd/sdf/copyUtils.h"
 #include "pxr/usd/usd/attribute.h"
 #include "pxr/usd/usd/prim.h"
@@ -299,4 +300,57 @@ int usdinterop_has_file_format(const char *format_id) {
 
   const TfToken token(format_id);
   return SdfFileFormat::FindById(token) ? 1 : 0;
+}
+
+int usdinterop_is_package_relative_path(const char *path) {
+  if (!path || path[0] == '\0') {
+    return 0;
+  }
+  return ArIsPackageRelativePath(std::string(path)) ? 1 : 0;
+}
+
+const char *usdinterop_split_package_relative_path_outer_package(
+    const char *path) {
+  if (!path || path[0] == '\0') {
+    return nullptr;
+  }
+  const auto result = ArSplitPackageRelativePathOuter(std::string(path));
+  return CopyToCString(result.first);
+}
+
+const char *usdinterop_split_package_relative_path_outer_packaged(
+    const char *path) {
+  if (!path || path[0] == '\0') {
+    return nullptr;
+  }
+  const auto result = ArSplitPackageRelativePathOuter(std::string(path));
+  return CopyToCString(result.second);
+}
+
+const char *usdinterop_split_package_relative_path_inner_package(
+    const char *path) {
+  if (!path || path[0] == '\0') {
+    return nullptr;
+  }
+  const auto result = ArSplitPackageRelativePathInner(std::string(path));
+  return CopyToCString(result.first);
+}
+
+const char *usdinterop_split_package_relative_path_inner_packaged(
+    const char *path) {
+  if (!path || path[0] == '\0') {
+    return nullptr;
+  }
+  const auto result = ArSplitPackageRelativePathInner(std::string(path));
+  return CopyToCString(result.second);
+}
+
+const char *usdinterop_join_package_relative_path(const char *package_path,
+                                                  const char *packaged_path) {
+  if (!package_path || package_path[0] == '\0' || !packaged_path ||
+      packaged_path[0] == '\0') {
+    return nullptr;
+  }
+  return CopyToCString(ArJoinPackageRelativePath(std::string(package_path),
+                                                 std::string(packaged_path)));
 }
