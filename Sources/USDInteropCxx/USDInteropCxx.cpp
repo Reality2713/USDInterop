@@ -9,7 +9,10 @@
 #include "pxr/base/tf/token.h"
 #include "pxr/base/vt/array.h"
 #include "pxr/pxr.h"
+#include "pxr/usd/ar/asset.h"
 #include "pxr/usd/ar/packageUtils.h"
+#include "pxr/usd/ar/resolver.h"
+#include "pxr/usd/ar/resolverContextBinder.h"
 #include "pxr/usd/sdf/copyUtils.h"
 #include "pxr/usd/usd/attribute.h"
 #include "pxr/usd/usd/prim.h"
@@ -46,6 +49,23 @@ const char *CopyToCString(const std::string &value) {
   }
   std::memcpy(buffer, value.data(), value.size());
   buffer[value.size()] = '\0';
+  return buffer;
+}
+
+const unsigned char *CopyToByteBuffer(const char *data, size_t size) {
+  if (!data && size != 0) {
+    return nullptr;
+  }
+
+  auto *buffer = static_cast<unsigned char *>(std::malloc(size == 0 ? 1 : size));
+  if (!buffer) {
+    return nullptr;
+  }
+
+  if (size != 0) {
+    std::memcpy(buffer, data, size);
+  }
+
   return buffer;
 }
 
@@ -307,6 +327,72 @@ int usdinterop_is_package_relative_path(const char *path) {
     return 0;
   }
   return ArIsPackageRelativePath(std::string(path)) ? 1 : 0;
+}
+
+const unsigned char *usdinterop_read_asset_bytes(const char *asset_path,
+                                                 const char *anchor_asset_path,
+                                                 size_t *size) {
+  if (!asset_path || asset_path[0] == '\0' || !size) {
+    return nullptr;
+  }
+
+  *size = 0;
+
+  try {
+    ArResolver &resolver = ArGetResolver();
+
+    const std::string assetPath(asset_path);
+    const std::string anchorAssetPath =
+        (anchor_asset_path && anchor_asset_path[0] != '\0')
+            ? std::string(anchor_asset_path)
+            : std::string();
+
+    const std::string contextAssetPath =
+        !anchorAssetPath.empty() ? anchorAssetPath : assetPath;
+    ArResolverContext context =
+        resolver.CreateDefaultContextForAsset(contextAssetPath);
+    ArResolverContextBinder binder(&resolver, context);
+
+    const ArResolvedPath anchorResolvedPath =
+        !anchorAssetPath.empty() ? resolver.Resolve(anchorAssetPath)
+                                 : ArResolvedPath();
+    const std::string identifier =
+        resolver.CreateIdentifier(assetPath, anchorResolvedPath);
+    const ArResolvedPath resolvedPath = resolver.Resolve(identifier);
+    if (resolvedPath.empty()) {
+      return nullptr;
+    }
+
+    std::shared_ptr<ArAsset> asset = resolver.OpenAsset(resolvedPath);
+    if (!asset) {
+      return nullptr;
+    }
+
+    const size_t assetSize = asset->GetSize();
+    std::shared_ptr<const char> buffer = asset->GetBuffer();
+    if (!buffer && assetSize != 0) {
+      return nullptr;
+    }
+
+    const unsigned char *copied =
+        CopyToByteBuffer(buffer.get(), assetSize);
+    if (!copied) {
+      return nullptr;
+    }
+
+    *size = assetSize;
+    return copied;
+  } catch (...) {
+    *size = 0;
+    return nullptr;
+  }
+}
+
+void usdinterop_free_bytes(const void *value) {
+  if (!value) {
+    return;
+  }
+  std::free(const_cast<void *>(value));
 }
 
 const char *usdinterop_split_package_relative_path_outer_package(

@@ -48,6 +48,17 @@ const char *usdinterop_split_package_relative_path_inner_packaged(const char *pa
 /// Joins a package path and packaged path using canonical Ar rules.
 const char *usdinterop_join_package_relative_path(const char *package_path, const char *packaged_path);
 
+/// Reads asset bytes using the canonical Ar resolver and returns a malloc-owned buffer.
+/// `anchor_asset_path` is optional and is used to resolve relative asset paths.
+const unsigned char *usdinterop_read_asset_bytes(
+    const char *asset_path,
+    const char *anchor_asset_path,
+    size_t *size
+);
+
+/// Frees a buffer returned by `usdinterop_read_asset_bytes`.
+void usdinterop_free_bytes(const void *value);
+
 #ifdef __cplusplus
 }
 #endif

@@ -147,3 +147,30 @@ public enum USDInteropPackagePaths {
 		return current.trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
 	}
 }
+
+public enum USDInteropAssets {
+	public static func readData(assetPath: String, anchorAssetPath: String? = nil) -> Data? {
+		var byteCount: Int = 0
+		let dataPointer: UnsafePointer<UInt8>? = assetPath.withCString { assetPointer in
+			if let anchorAssetPath {
+				return anchorAssetPath.withCString { anchorPointer in
+					var count: Int = 0
+					let pointer = usdinterop_read_asset_bytes(assetPointer, anchorPointer, &count)
+					byteCount = count
+					return pointer
+				}
+			} else {
+				var count: Int = 0
+				let pointer = usdinterop_read_asset_bytes(assetPointer, nil, &count)
+				byteCount = count
+				return pointer
+			}
+		}
+
+		guard let dataPointer else {
+			return nil
+		}
+		defer { usdinterop_free_bytes(dataPointer) }
+		return Data(bytes: dataPointer, count: byteCount)
+	}
+}
