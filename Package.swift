@@ -4,6 +4,7 @@ import PackageDescription
 let package = Package(
     name: "USDInterop",
     platforms: [
+        .iOS(.v26),
         .macOS(.v15),
         .visionOS(.v26)
     ],
@@ -26,7 +27,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/Reality2713/SwiftUsd.git", exact: "6.1.0-preflight.1")
+        .package(url: "https://github.com/Reality2713/SwiftUsd.git", exact: "6.1.0-preflight.2")
     ],
     targets: [
         .target(
