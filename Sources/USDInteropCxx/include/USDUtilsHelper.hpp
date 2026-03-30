@@ -38,6 +38,14 @@ struct DependencyCheckResultCxx {
   int unresolvedCount;
 };
 
+struct UsdzPackagingResultCxx {
+  bool success;
+  int diagnosticCount;
+  int warningCount;
+  int errorCount;
+  int failedAssetCount;
+};
+
 /// Check dependencies and return result struct
 DependencyCheckResultCxx CheckDependenciesSimple(const std::string &assetPath);
 
@@ -58,6 +66,18 @@ void ClearUnresolvedCache();
 /// @return true on success, false on failure
 bool CreateUsdzPackageNative(const std::string &assetPath,
                              const std::string &outputPath);
+
+UsdzPackagingResultCxx CreateUsdzPackageNativeDetailed(
+    const std::string &assetPath,
+    const std::string &outputPath);
+
+std::string GetPackagingDiagnosticMessage(int index);
+
+int GetPackagingDiagnosticSeverity(int index);
+
+std::string GetPackagingFailedAssetPath(int index);
+
+void ClearPackagingDiagnosticCache();
 
 // Clean namespaced aliases for Swift to bypass 'pxr' shadowing
 namespace USD {
