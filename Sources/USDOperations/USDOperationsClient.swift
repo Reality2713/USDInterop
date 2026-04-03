@@ -220,6 +220,24 @@ public struct USDOperationsClient: Sendable {
         return parseReferencesFromMetadata(String(describing: refsValue))
     }
 
+    public func primSourceInfo(url: URL, path: String) -> USDPrimSourceInfo? {
+        let sourceSite = url.path.withCString { stagePointer in
+            path.withCString { primPointer in
+                usdinterop_stage_prim_strongest_source_site(stagePointer, primPointer)
+            }
+        }
+
+        guard sourceSite.found != 0 else {
+            return nil
+        }
+
+        let strongestSourceSite = makeSourceSite(sourceSite)
+        return USDPrimSourceInfo(
+            primPath: path,
+            strongestSourceSite: strongestSourceSite
+        )
+    }
+
     public func listVariantSets(url: URL, scope: USDVariantScope) throws -> [USDVariantSetDescriptor] {
         let stage = try openStage(url)
         let prim = try prim(for: scope, stage: stage)
@@ -712,6 +730,30 @@ private func parseReferencesFromMetadata(_ raw: String) -> [USDReference] {
 
 private func isSameReference(_ lhs: USDReference, _ rhs: USDReference) -> Bool {
     lhs.assetPath == rhs.assetPath && (lhs.primPath ?? "") == (rhs.primPath ?? "")
+}
+
+private func makeSourceSite(_ sourceSite: USDInteropSourceSite) -> USDSourceSite? {
+    guard let layerIdentifierPointer = sourceSite.layerIdentifier else {
+        return nil
+    }
+
+    let layerIdentifier = String(cString: layerIdentifierPointer)
+    let layerRealPath = sourceSite.layerRealPath.map { String(cString: $0) }
+    let specPath = sourceSite.specPath.map { String(cString: $0) }
+
+    usdinterop_free_string(layerIdentifierPointer)
+    if let layerRealPathPointer = sourceSite.layerRealPath {
+        usdinterop_free_string(layerRealPathPointer)
+    }
+    if let specPathPointer = sourceSite.specPath {
+        usdinterop_free_string(specPathPointer)
+    }
+
+    return USDSourceSite(
+        layerIdentifier: layerIdentifier,
+        layerRealPath: layerRealPath,
+        specPath: specPath
+    )
 }
 
 private func extractTransform(from prim: UsdPrim) -> USDTransformData? {

@@ -14,6 +14,7 @@
 #include "pxr/usd/ar/resolver.h"
 #include "pxr/usd/ar/resolverContextBinder.h"
 #include "pxr/usd/sdf/copyUtils.h"
+#include "pxr/usd/sdf/primSpec.h"
 #include "pxr/usd/usd/attribute.h"
 #include "pxr/usd/usd/prim.h"
 #include "pxr/usd/usd/primRange.h"
@@ -277,6 +278,53 @@ USDInteropBounds usdinterop_scene_bounds(const char *path) {
         static_cast<float>(std::max(extentX, std::max(extentY, extentZ)));
   }
 
+  return result;
+}
+
+USDInteropSourceSite usdinterop_stage_prim_strongest_source_site(
+    const char *stage_path,
+    const char *prim_path
+) {
+  USDInteropSourceSite result = {};
+  result.found = 0;
+
+  if (!stage_path || stage_path[0] == '\0' || !prim_path || prim_path[0] == '\0') {
+    return result;
+  }
+
+  UsdStageRefPtr stage = UsdStage::Open(std::string(stage_path), UsdStage::LoadAll);
+  if (!stage) {
+    return result;
+  }
+
+  const UsdPrim prim = stage->GetPrimAtPath(SdfPath(std::string(prim_path)));
+  if (!prim.IsValid()) {
+    return result;
+  }
+
+  const auto primStack = prim.GetPrimStack();
+  if (primStack.empty()) {
+    return result;
+  }
+
+  const SdfPrimSpecHandle &spec = primStack.front();
+  if (!spec) {
+    return result;
+  }
+
+  const SdfLayerHandle layer = spec->GetLayer();
+  if (!layer) {
+    return result;
+  }
+
+  const std::string layerIdentifier = layer->GetIdentifier();
+  const std::string layerRealPath = layer->GetRealPath();
+  const std::string specPath = spec->GetPath().GetAsString();
+
+  result.found = 1;
+  result.layerIdentifier = CopyToCString(layerIdentifier);
+  result.layerRealPath = layerRealPath.empty() ? nullptr : CopyToCString(layerRealPath);
+  result.specPath = specPath.empty() ? nullptr : CopyToCString(specPath);
   return result;
 }
 

@@ -15,12 +15,25 @@ typedef struct {
     int hasGeometry;  // 1 if valid, 0 if no geometry
 } USDInteropBounds;
 
+typedef struct {
+    int found;
+    const char *layerIdentifier;
+    const char *layerRealPath;
+    const char *specPath;
+} USDInteropSourceSite;
+
 const char *usdinterop_export_usda(const char *path);
 const char *usdinterop_scene_graph_json(const char *path);
 void usdinterop_free_string(const char *value);
 
 /// Get scene bounds by iterating mesh points
 USDInteropBounds usdinterop_scene_bounds(const char *path);
+
+/// Returns the strongest authored source site for a prim in the stage.
+USDInteropSourceSite usdinterop_stage_prim_strongest_source_site(
+    const char *stage_path,
+    const char *prim_path
+);
 
 /// Force OpenUSD to scan/register plugins under `path`.
 /// Returns the number of plugins registered by this call.

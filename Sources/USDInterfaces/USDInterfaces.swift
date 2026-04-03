@@ -33,6 +33,32 @@ public struct USDReference: Equatable, Sendable {
     }
 }
 
+public struct USDSourceSite: Equatable, Sendable {
+    public var layerIdentifier: String
+    public var layerRealPath: String?
+    public var specPath: String?
+
+    public init(
+        layerIdentifier: String,
+        layerRealPath: String? = nil,
+        specPath: String? = nil
+    ) {
+        self.layerIdentifier = layerIdentifier
+        self.layerRealPath = layerRealPath
+        self.specPath = specPath
+    }
+}
+
+public struct USDPrimSourceInfo: Equatable, Sendable {
+    public var primPath: String
+    public var strongestSourceSite: USDSourceSite?
+
+    public init(primPath: String, strongestSourceSite: USDSourceSite? = nil) {
+        self.primPath = primPath
+        self.strongestSourceSite = strongestSourceSite
+    }
+}
+
 public protocol USDAExporting: Sendable {
     func exportUSDA(url: URL) -> String?
 }
