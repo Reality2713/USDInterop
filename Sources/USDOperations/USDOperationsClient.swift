@@ -220,21 +220,46 @@ public struct USDOperationsClient: Sendable {
         return parseReferencesFromMetadata(String(describing: refsValue))
     }
 
-    public func primSourceInfo(url: URL, path: String) -> USDPrimSourceInfo? {
-        let sourceSite = url.path.withCString { stagePointer in
+    public func primProvenance(url: URL, path: String) -> USDPrimProvenance? {
+        let sourceSiteList = url.path.withCString { stagePointer in
             path.withCString { primPointer in
-                usdinterop_stage_prim_strongest_source_site(stagePointer, primPointer)
+                usdinterop_stage_prim_source_sites(stagePointer, primPointer)
             }
         }
 
-        guard sourceSite.found != 0 else {
+        let sites = makeSourceSites(sourceSiteList)
+        guard sites.isEmpty == false else {
             return nil
         }
 
-        let strongestSourceSite = makeSourceSite(sourceSite)
-        return USDPrimSourceInfo(
+        return USDPrimProvenance(
             primPath: path,
-            strongestSourceSite: strongestSourceSite
+            sites: sites
+        )
+    }
+
+    @available(*, deprecated, renamed: "primProvenance(url:path:)")
+    public func primSourceInfo(url: URL, path: String) -> USDPrimSourceInfo? {
+        primProvenance(url: url, path: path)
+    }
+
+    public func propertyProvenance(url: URL, path: String) -> USDPropertyProvenance? {
+        let sourceSiteList = url.path.withCString { stagePointer in
+            path.withCString { propertyPointer in
+                usdinterop_stage_property_source_sites(stagePointer, propertyPointer)
+            }
+        }
+
+        let sites = makeSourceSites(sourceSiteList)
+        guard sites.isEmpty == false else {
+            return nil
+        }
+
+        let primPath = propertyPrimPath(from: path)
+        return USDPropertyProvenance(
+            propertyPath: path,
+            primPath: primPath,
+            sites: sites
         )
     }
 
@@ -732,6 +757,17 @@ private func isSameReference(_ lhs: USDReference, _ rhs: USDReference) -> Bool {
     lhs.assetPath == rhs.assetPath && (lhs.primPath ?? "") == (rhs.primPath ?? "")
 }
 
+private func makeSourceSites(_ sourceSiteList: USDInteropSourceSiteList) -> [USDSourceSite] {
+    guard let sitesPointer = sourceSiteList.sites else {
+        return []
+    }
+
+    let buffer = UnsafeBufferPointer(start: sitesPointer, count: Int(sourceSiteList.count))
+    let sites = buffer.compactMap(makeSourceSite(_:))
+    usdinterop_free_source_site_list(sourceSiteList)
+    return sites
+}
+
 private func makeSourceSite(_ sourceSite: USDInteropSourceSite) -> USDSourceSite? {
     guard let layerIdentifierPointer = sourceSite.layerIdentifier else {
         return nil
@@ -741,19 +777,50 @@ private func makeSourceSite(_ sourceSite: USDInteropSourceSite) -> USDSourceSite
     let layerRealPath = sourceSite.layerRealPath.map { String(cString: $0) }
     let specPath = sourceSite.specPath.map { String(cString: $0) }
 
-    usdinterop_free_string(layerIdentifierPointer)
-    if let layerRealPathPointer = sourceSite.layerRealPath {
-        usdinterop_free_string(layerRealPathPointer)
-    }
-    if let specPathPointer = sourceSite.specPath {
-        usdinterop_free_string(specPathPointer)
-    }
-
     return USDSourceSite(
         layerIdentifier: layerIdentifier,
         layerRealPath: layerRealPath,
-        specPath: specPath
+        specPath: specPath,
+        role: makeProvenanceRole(sourceSite.role),
+        kind: makeProvenanceKind(sourceSite.kind)
     )
+}
+
+private func makeProvenanceRole(_ rawValue: Int32) -> USDProvenanceRole {
+    switch rawValue {
+    case 0:
+        return .strongestOpinion
+    default:
+        return .contributingOpinion
+    }
+}
+
+private func makeProvenanceKind(_ rawValue: Int32) -> USDProvenanceKind {
+    switch rawValue {
+    case 1:
+        return .localLayer
+    case 2:
+        return .sublayer
+    case 3:
+        return .reference
+    case 4:
+        return .payload
+    case 5:
+        return .inherits
+    case 6:
+        return .specializes
+    case 7:
+        return .variant
+    default:
+        return .unknown
+    }
+}
+
+private func propertyPrimPath(from propertyPath: String) -> String {
+    guard let propertyDelimiter = propertyPath.firstIndex(of: ".") else {
+        return propertyPath
+    }
+    return String(propertyPath[..<propertyDelimiter])
 }
 
 private func extractTransform(from prim: UsdPrim) -> USDTransformData? {

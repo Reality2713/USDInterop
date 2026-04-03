@@ -33,31 +33,79 @@ public struct USDReference: Equatable, Sendable {
     }
 }
 
+public enum USDProvenanceRole: String, Equatable, Sendable, Codable {
+    case strongestOpinion
+    case contributingOpinion
+}
+
+public enum USDProvenanceKind: String, Equatable, Sendable, Codable {
+    case localLayer
+    case sublayer
+    case reference
+    case payload
+    case inherits
+    case specializes
+    case variant
+    case unknown
+}
+
 public struct USDSourceSite: Equatable, Sendable {
     public var layerIdentifier: String
     public var layerRealPath: String?
     public var specPath: String?
+    public var role: USDProvenanceRole
+    public var kind: USDProvenanceKind
 
     public init(
         layerIdentifier: String,
         layerRealPath: String? = nil,
-        specPath: String? = nil
+        specPath: String? = nil,
+        role: USDProvenanceRole = .strongestOpinion,
+        kind: USDProvenanceKind = .unknown
     ) {
         self.layerIdentifier = layerIdentifier
         self.layerRealPath = layerRealPath
         self.specPath = specPath
+        self.role = role
+        self.kind = kind
     }
 }
 
-public struct USDPrimSourceInfo: Equatable, Sendable {
+public struct USDPrimProvenance: Equatable, Sendable {
     public var primPath: String
-    public var strongestSourceSite: USDSourceSite?
+    public var sites: [USDSourceSite]
 
-    public init(primPath: String, strongestSourceSite: USDSourceSite? = nil) {
+    public init(primPath: String, sites: [USDSourceSite] = []) {
         self.primPath = primPath
-        self.strongestSourceSite = strongestSourceSite
+        self.sites = sites
+    }
+
+    public var strongestSourceSite: USDSourceSite? {
+        sites.first(where: { $0.role == .strongestOpinion }) ?? sites.first
     }
 }
+
+public struct USDPropertyProvenance: Equatable, Sendable {
+    public var propertyPath: String
+    public var primPath: String
+    public var sites: [USDSourceSite]
+
+    public init(
+        propertyPath: String,
+        primPath: String,
+        sites: [USDSourceSite] = []
+    ) {
+        self.propertyPath = propertyPath
+        self.primPath = primPath
+        self.sites = sites
+    }
+
+    public var strongestSourceSite: USDSourceSite? {
+        sites.first(where: { $0.role == .strongestOpinion }) ?? sites.first
+    }
+}
+
+public typealias USDPrimSourceInfo = USDPrimProvenance
 
 public protocol USDAExporting: Sendable {
     func exportUSDA(url: URL) -> String?

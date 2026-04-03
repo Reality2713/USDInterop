@@ -1,6 +1,8 @@
 #ifndef USDINTEROPCXX_H
 #define USDINTEROPCXX_H
 
+#include <stddef.h>
+
 #ifdef __cplusplus
 #include "USDUtilsHelper.hpp"
 extern "C" {
@@ -16,11 +18,17 @@ typedef struct {
 } USDInteropBounds;
 
 typedef struct {
-    int found;
     const char *layerIdentifier;
     const char *layerRealPath;
     const char *specPath;
+    int role;
+    int kind;
 } USDInteropSourceSite;
+
+typedef struct {
+    size_t count;
+    USDInteropSourceSite *sites;
+} USDInteropSourceSiteList;
 
 const char *usdinterop_export_usda(const char *path);
 const char *usdinterop_scene_graph_json(const char *path);
@@ -29,11 +37,20 @@ void usdinterop_free_string(const char *value);
 /// Get scene bounds by iterating mesh points
 USDInteropBounds usdinterop_scene_bounds(const char *path);
 
-/// Returns the strongest authored source site for a prim in the stage.
-USDInteropSourceSite usdinterop_stage_prim_strongest_source_site(
+/// Returns a strength-ordered list of authored source sites for a prim in the stage.
+USDInteropSourceSiteList usdinterop_stage_prim_source_sites(
     const char *stage_path,
     const char *prim_path
 );
+
+/// Returns a strength-ordered list of authored source sites for a property in the stage.
+USDInteropSourceSiteList usdinterop_stage_property_source_sites(
+    const char *stage_path,
+    const char *property_path
+);
+
+/// Frees the strings and backing array returned in a source site list.
+void usdinterop_free_source_site_list(USDInteropSourceSiteList list);
 
 /// Force OpenUSD to scan/register plugins under `path`.
 /// Returns the number of plugins registered by this call.

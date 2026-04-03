@@ -15,9 +15,11 @@
 #include "pxr/usd/ar/resolverContextBinder.h"
 #include "pxr/usd/sdf/copyUtils.h"
 #include "pxr/usd/sdf/primSpec.h"
+#include "pxr/usd/sdf/propertySpec.h"
 #include "pxr/usd/usd/attribute.h"
 #include "pxr/usd/usd/prim.h"
 #include "pxr/usd/usd/primRange.h"
+#include "pxr/usd/usd/property.h"
 #include "pxr/usd/usd/stage.h"
 #include "pxr/usd/usd/timeCode.h"
 #include "pxr/usd/sdf/fileFormat.h"
@@ -137,6 +139,67 @@ void AppendPrimJson(const UsdPrim &prim, std::string &out) {
   }
 
   out += "]}";
+}
+
+USDInteropSourceSite MakeSourceSite(
+    const SdfLayerHandle &layer,
+    const std::string &specPath,
+    int role
+) {
+  USDInteropSourceSite result = {};
+  if (!layer) {
+    return result;
+  }
+
+  const std::string layerIdentifier = layer->GetIdentifier();
+  const std::string layerRealPath = layer->GetRealPath();
+
+  result.layerIdentifier = CopyToCString(layerIdentifier);
+  result.layerRealPath =
+      layerRealPath.empty() ? nullptr : CopyToCString(layerRealPath);
+  result.specPath = specPath.empty() ? nullptr : CopyToCString(specPath);
+  result.role = role;
+  result.kind = 0; // unknown until we add canonical arc classification.
+  return result;
+}
+
+template <typename HandleVector>
+USDInteropSourceSiteList MakeSourceSiteList(const HandleVector &specStack) {
+  USDInteropSourceSiteList result = {};
+  if (specStack.empty()) {
+    return result;
+  }
+
+  auto *sites = static_cast<USDInteropSourceSite *>(
+      std::calloc(specStack.size(), sizeof(USDInteropSourceSite)));
+  if (!sites) {
+    return result;
+  }
+
+  size_t count = 0;
+  for (size_t index = 0; index < specStack.size(); ++index) {
+    const auto &spec = specStack[index];
+    if (!spec) {
+      continue;
+    }
+
+    const SdfLayerHandle layer = spec->GetLayer();
+    if (!layer) {
+      continue;
+    }
+
+    sites[count++] = MakeSourceSite(
+        layer, spec->GetPath().GetAsString(), index == 0 ? 0 : 1);
+  }
+
+  if (count == 0) {
+    std::free(sites);
+    return result;
+  }
+
+  result.count = count;
+  result.sites = sites;
+  return result;
 }
 } // namespace
 
@@ -281,12 +344,11 @@ USDInteropBounds usdinterop_scene_bounds(const char *path) {
   return result;
 }
 
-USDInteropSourceSite usdinterop_stage_prim_strongest_source_site(
+USDInteropSourceSiteList usdinterop_stage_prim_source_sites(
     const char *stage_path,
     const char *prim_path
 ) {
-  USDInteropSourceSite result = {};
-  result.found = 0;
+  USDInteropSourceSiteList result = {};
 
   if (!stage_path || stage_path[0] == '\0' || !prim_path || prim_path[0] == '\0') {
     return result;
@@ -303,29 +365,52 @@ USDInteropSourceSite usdinterop_stage_prim_strongest_source_site(
   }
 
   const auto primStack = prim.GetPrimStack();
-  if (primStack.empty()) {
+  return MakeSourceSiteList(primStack);
+}
+
+USDInteropSourceSiteList usdinterop_stage_property_source_sites(
+    const char *stage_path,
+    const char *property_path
+) {
+  USDInteropSourceSiteList result = {};
+
+  if (!stage_path || stage_path[0] == '\0' || !property_path || property_path[0] == '\0') {
     return result;
   }
 
-  const SdfPrimSpecHandle &spec = primStack.front();
-  if (!spec) {
+  UsdStageRefPtr stage = UsdStage::Open(std::string(stage_path), UsdStage::LoadAll);
+  if (!stage) {
     return result;
   }
 
-  const SdfLayerHandle layer = spec->GetLayer();
-  if (!layer) {
+  const UsdProperty property = stage->GetPropertyAtPath(SdfPath(std::string(property_path)));
+  if (!property.IsDefined()) {
     return result;
   }
 
-  const std::string layerIdentifier = layer->GetIdentifier();
-  const std::string layerRealPath = layer->GetRealPath();
-  const std::string specPath = spec->GetPath().GetAsString();
+  const auto propertyStack = property.GetPropertyStack(UsdTimeCode::Default());
+  return MakeSourceSiteList(propertyStack);
+}
 
-  result.found = 1;
-  result.layerIdentifier = CopyToCString(layerIdentifier);
-  result.layerRealPath = layerRealPath.empty() ? nullptr : CopyToCString(layerRealPath);
-  result.specPath = specPath.empty() ? nullptr : CopyToCString(specPath);
-  return result;
+void usdinterop_free_source_site_list(USDInteropSourceSiteList list) {
+  if (!list.sites) {
+    return;
+  }
+
+  for (size_t index = 0; index < list.count; ++index) {
+    const USDInteropSourceSite &site = list.sites[index];
+    if (site.layerIdentifier) {
+      usdinterop_free_string(site.layerIdentifier);
+    }
+    if (site.layerRealPath) {
+      usdinterop_free_string(site.layerRealPath);
+    }
+    if (site.specPath) {
+      usdinterop_free_string(site.specPath);
+    }
+  }
+
+  std::free(list.sites);
 }
 
 int usdinterop_register_plugins(const char *path) {
