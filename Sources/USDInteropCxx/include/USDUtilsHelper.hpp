@@ -107,6 +107,8 @@ using UsdGeomXformOp = pxr::UsdGeomXformOp;
 // Shade & Skel
 using UsdShadeMaterial = pxr::UsdShadeMaterial;
 using UsdShadeShader = pxr::UsdShadeShader;
+using UsdShadeInput = pxr::UsdShadeInput;
+using UsdShadeOutput = pxr::UsdShadeOutput;
 using UsdShadeMaterialBindingAPI = pxr::UsdShadeMaterialBindingAPI;
 using UsdShadeConnectableAPI = pxr::UsdShadeConnectableAPI;
 using UsdSkelBindingAPI = pxr::UsdSkelBindingAPI;
@@ -135,6 +137,31 @@ bool CopySpecFromLayerRefPtr(const USD::SdfLayerRefPtr &srcLayer,
                              const USD::SdfPath &srcPath,
                              const USD::SdfLayerHandle &dstLayer,
                              const USD::SdfPath &dstPath);
+
+/// Mutation helpers that catch C++ exceptions before they cross into Swift.
+bool ClearAttributeConnections(USD::UsdAttribute attr);
+
+bool SetAttributeAssetPath(USD::UsdAttribute attr,
+                           const std::string &assetPath,
+                           const USD::UsdTimeCode &timeCode);
+
+USD::UsdShadeInput CreateShaderInput(USD::UsdShadeShader shader,
+                                     const USD::TfToken &name,
+                                     const pxr::SdfValueTypeName &typeName);
+
+USD::UsdShadeOutput CreateShaderOutput(USD::UsdShadeShader shader,
+                                       const USD::TfToken &name,
+                                       const pxr::SdfValueTypeName &typeName);
+
+bool CreateShaderIdAttr(USD::UsdShadeShader shader,
+                        const USD::TfToken &identifier);
+
+bool ConnectShadeInputToOutput(USD::UsdShadeInput input,
+                               USD::UsdShadeOutput output);
+
+bool ExportStage(const USD::UsdStage &stage,
+                 const std::string &path,
+                 bool addSourceFileComment);
 }
 
 #endif

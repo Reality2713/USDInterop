@@ -220,6 +220,72 @@ bool CopySpecFromLayerRefPtr(const USD::SdfLayerRefPtr &srcLayer,
   }
   return SdfCopySpec(srcLayer, srcPath, dstLayer, dstPath);
 }
+
+bool ClearAttributeConnections(USD::UsdAttribute attr) {
+  try {
+    return attr.ClearConnections();
+  } catch (...) {
+    return false;
+  }
+}
+
+bool SetAttributeAssetPath(USD::UsdAttribute attr,
+                           const std::string &assetPath,
+                           const USD::UsdTimeCode &timeCode) {
+  try {
+    return attr.Set(USD::VtValue(SdfAssetPath(assetPath)), timeCode);
+  } catch (...) {
+    return false;
+  }
+}
+
+USD::UsdShadeInput CreateShaderInput(USD::UsdShadeShader shader,
+                                     const USD::TfToken &name,
+                                     const pxr::SdfValueTypeName &typeName) {
+  try {
+    return shader.CreateInput(name, typeName);
+  } catch (...) {
+    return USD::UsdShadeInput();
+  }
+}
+
+USD::UsdShadeOutput CreateShaderOutput(USD::UsdShadeShader shader,
+                                       const USD::TfToken &name,
+                                       const pxr::SdfValueTypeName &typeName) {
+  try {
+    return shader.CreateOutput(name, typeName);
+  } catch (...) {
+    return USD::UsdShadeOutput();
+  }
+}
+
+bool CreateShaderIdAttr(USD::UsdShadeShader shader,
+                        const USD::TfToken &identifier) {
+  try {
+    return shader.CreateIdAttr(USD::VtValue(identifier), false).IsValid();
+  } catch (...) {
+    return false;
+  }
+}
+
+bool ConnectShadeInputToOutput(USD::UsdShadeInput input,
+                               USD::UsdShadeOutput output) {
+  try {
+    return input.ConnectToSource(output);
+  } catch (...) {
+    return false;
+  }
+}
+
+bool ExportStage(const USD::UsdStage &stage,
+                 const std::string &path,
+                 bool addSourceFileComment) {
+  try {
+    return stage.Export(path, addSourceFileComment, SdfLayer::FileFormatArguments());
+  } catch (...) {
+    return false;
+  }
+}
 } // namespace USDInterop
 
 const char *usdinterop_export_usda(const char *path) {
