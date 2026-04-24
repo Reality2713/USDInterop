@@ -82,6 +82,80 @@ public enum USDInteropOpenUSDShim {
     }
 
     @inline(__always)
+    public static func setAttributeBool(
+        _ attr: pxrInternal_v0_26_3__pxrReserved__.UsdAttribute,
+        value: Bool,
+        timeCode: pxrInternal_v0_26_3__pxrReserved__.UsdTimeCode
+    ) -> Bool {
+        USDInteropCxx.USDInterop.SetAttributeBool(attr, value, timeCode)
+    }
+
+    @inline(__always)
+    public static func setAttributeFloat(
+        _ attr: pxrInternal_v0_26_3__pxrReserved__.UsdAttribute,
+        value: Float,
+        timeCode: pxrInternal_v0_26_3__pxrReserved__.UsdTimeCode
+    ) -> Bool {
+        USDInteropCxx.USDInterop.SetAttributeFloat(attr, value, timeCode)
+    }
+
+    @inline(__always)
+    public static func setAttributeInt(
+        _ attr: pxrInternal_v0_26_3__pxrReserved__.UsdAttribute,
+        value: Int32,
+        timeCode: pxrInternal_v0_26_3__pxrReserved__.UsdTimeCode
+    ) -> Bool {
+        USDInteropCxx.USDInterop.SetAttributeInt(attr, value, timeCode)
+    }
+
+    @inline(__always)
+    public static func setAttributeColor3f(
+        _ attr: pxrInternal_v0_26_3__pxrReserved__.UsdAttribute,
+        red: Float,
+        green: Float,
+        blue: Float,
+        timeCode: pxrInternal_v0_26_3__pxrReserved__.UsdTimeCode
+    ) -> Bool {
+        USDInteropCxx.USDInterop.SetAttributeColor3f(attr, red, green, blue, timeCode)
+    }
+
+    @inline(__always)
+    public static func setAttributeString(
+        _ attr: pxrInternal_v0_26_3__pxrReserved__.UsdAttribute,
+        value: String,
+        timeCode: pxrInternal_v0_26_3__pxrReserved__.UsdTimeCode
+    ) -> Bool {
+        USDInteropCxx.USDInterop.SetAttributeString(attr, std.string(value), timeCode)
+    }
+
+    @inline(__always)
+    public static func setAttributeToken(
+        _ attr: pxrInternal_v0_26_3__pxrReserved__.UsdAttribute,
+        value: String,
+        timeCode: pxrInternal_v0_26_3__pxrReserved__.UsdTimeCode
+    ) -> Bool {
+        USDInteropCxx.USDInterop.SetAttributeToken(
+            attr,
+            pxrInternal_v0_26_3__pxrReserved__.TfToken(std.string(value)),
+            timeCode
+        )
+    }
+
+    @inline(__always)
+    public static func blockAttribute(
+        _ attr: pxrInternal_v0_26_3__pxrReserved__.UsdAttribute
+    ) -> Bool {
+        USDInteropCxx.USDInterop.BlockAttribute(attr)
+    }
+
+    @inline(__always)
+    public static func disconnectShadeInput(
+        _ input: pxrInternal_v0_26_3__pxrReserved__.UsdShadeInput
+    ) -> Bool {
+        USDInteropCxx.USDInterop.DisconnectShadeInput(input)
+    }
+
+    @inline(__always)
     public static func createShaderInput(
         _ shader: pxrInternal_v0_26_3__pxrReserved__.UsdShadeShader,
         name: pxrInternal_v0_26_3__pxrReserved__.TfToken,

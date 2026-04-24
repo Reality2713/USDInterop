@@ -145,6 +145,36 @@ bool SetAttributeAssetPath(USD::UsdAttribute attr,
                            const std::string &assetPath,
                            const USD::UsdTimeCode &timeCode);
 
+bool SetAttributeBool(USD::UsdAttribute attr,
+                      bool value,
+                      const USD::UsdTimeCode &timeCode);
+
+bool SetAttributeFloat(USD::UsdAttribute attr,
+                       float value,
+                       const USD::UsdTimeCode &timeCode);
+
+bool SetAttributeInt(USD::UsdAttribute attr,
+                     int value,
+                     const USD::UsdTimeCode &timeCode);
+
+bool SetAttributeColor3f(USD::UsdAttribute attr,
+                         float red,
+                         float green,
+                         float blue,
+                         const USD::UsdTimeCode &timeCode);
+
+bool SetAttributeString(USD::UsdAttribute attr,
+                        const std::string &value,
+                        const USD::UsdTimeCode &timeCode);
+
+bool SetAttributeToken(USD::UsdAttribute attr,
+                       const USD::TfToken &value,
+                       const USD::UsdTimeCode &timeCode);
+
+bool BlockAttribute(USD::UsdAttribute attr);
+
+bool DisconnectShadeInput(USD::UsdShadeInput input);
+
 USD::UsdShadeInput CreateShaderInput(USD::UsdShadeShader shader,
                                      const USD::TfToken &name,
                                      const pxr::SdfValueTypeName &typeName);

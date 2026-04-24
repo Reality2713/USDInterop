@@ -27,6 +27,7 @@
 #include "pxr/usd/usdGeom/tokens.h"
 
 #include <cstdlib>
+#include <cstdint>
 #include <cstring>
 #include <filesystem>
 #include <limits>
@@ -234,6 +235,85 @@ bool SetAttributeAssetPath(USD::UsdAttribute attr,
                            const USD::UsdTimeCode &timeCode) {
   try {
     return attr.Set(USD::VtValue(SdfAssetPath(assetPath)), timeCode);
+  } catch (...) {
+    return false;
+  }
+}
+
+bool SetAttributeBool(USD::UsdAttribute attr,
+                      bool value,
+                      const USD::UsdTimeCode &timeCode) {
+  try {
+    return attr.Set(USD::VtValue(value), timeCode);
+  } catch (...) {
+    return false;
+  }
+}
+
+bool SetAttributeFloat(USD::UsdAttribute attr,
+                       float value,
+                       const USD::UsdTimeCode &timeCode) {
+  try {
+    return attr.Set(USD::VtValue(value), timeCode);
+  } catch (...) {
+    return false;
+  }
+}
+
+bool SetAttributeInt(USD::UsdAttribute attr,
+                     int value,
+                     const USD::UsdTimeCode &timeCode) {
+  try {
+    return attr.Set(USD::VtValue(static_cast<int32_t>(value)), timeCode);
+  } catch (...) {
+    return false;
+  }
+}
+
+bool SetAttributeColor3f(USD::UsdAttribute attr,
+                         float red,
+                         float green,
+                         float blue,
+                         const USD::UsdTimeCode &timeCode) {
+  try {
+    return attr.Set(USD::VtValue(GfVec3f(red, green, blue)), timeCode);
+  } catch (...) {
+    return false;
+  }
+}
+
+bool SetAttributeString(USD::UsdAttribute attr,
+                        const std::string &value,
+                        const USD::UsdTimeCode &timeCode) {
+  try {
+    return attr.Set(USD::VtValue(value), timeCode);
+  } catch (...) {
+    return false;
+  }
+}
+
+bool SetAttributeToken(USD::UsdAttribute attr,
+                       const USD::TfToken &value,
+                       const USD::UsdTimeCode &timeCode) {
+  try {
+    return attr.Set(USD::VtValue(value), timeCode);
+  } catch (...) {
+    return false;
+  }
+}
+
+bool BlockAttribute(USD::UsdAttribute attr) {
+  try {
+    attr.Block();
+    return true;
+  } catch (...) {
+    return false;
+  }
+}
+
+bool DisconnectShadeInput(USD::UsdShadeInput input) {
+  try {
+    return input.DisconnectSource(USD::UsdAttribute());
   } catch (...) {
     return false;
   }
