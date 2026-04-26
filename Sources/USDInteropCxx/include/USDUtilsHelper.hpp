@@ -138,6 +138,8 @@ bool CopySpecFromLayerRefPtr(const USD::SdfLayerRefPtr &srcLayer,
                              const USD::SdfLayerHandle &dstLayer,
                              const USD::SdfPath &dstPath);
 
+
+
 /// Mutation helpers that catch C++ exceptions before they cross into Swift.
 bool ClearAttributeConnections(USD::UsdAttribute attr);
 

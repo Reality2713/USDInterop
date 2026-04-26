@@ -65,6 +65,7 @@ public enum USDInteropOpenUSDShim {
         }
     }
 
+
     @inline(__always)
     public static func clearAttributeConnections(
         _ attr: pxrInternal_v0_26_3__pxrReserved__.UsdAttribute

@@ -222,6 +222,8 @@ bool CopySpecFromLayerRefPtr(const USD::SdfLayerRefPtr &srcLayer,
   return SdfCopySpec(srcLayer, srcPath, dstLayer, dstPath);
 }
 
+
+
 bool ClearAttributeConnections(USD::UsdAttribute attr) {
   try {
     return attr.ClearConnections();
